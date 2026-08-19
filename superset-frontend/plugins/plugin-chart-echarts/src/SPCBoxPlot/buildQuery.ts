@@ -1,0 +1,82 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import {
+    AdhocColumn,
+    buildQueryContext,
+    ensureIsArray,
+    isPhysicalColumn,
+} from '@superset-ui/core';
+import { boxplotOperator } from '@superset-ui/chart-controls';
+import { SPCBoxPlotQueryFormData } from './types';
+
+export default function buildQuery(formData: SPCBoxPlotQueryFormData) {
+    return buildQueryContext(formData, baseQueryObject => {
+        const queries = [];
+
+        // Query 0: Boxplot (uses boxplotOperator post-processing)
+        queries.push({
+            ...baseQueryObject,
+            columns: [
+                ...(ensureIsArray(formData.columns).length === 0 &&
+                    formData.granularity_sqla
+                    ? [formData.granularity_sqla]
+                    : ensureIsArray(formData.columns)
+                ).map(col => {
+                    if (
+                        isPhysicalColumn(col) &&
+                        formData.time_grain_sqla &&
+                        formData?.temporal_columns_lookup?.[col]
+                    ) {
+                        return {
+                            timeGrain: formData.time_grain_sqla,
+                            columnType: 'BASE_AXIS',
+                            sqlExpression: col,
+                            label: col,
+                            expressionType: 'SQL',
+                        } as AdhocColumn;
+                    }
+                    return col;
+                }),
+                ...ensureIsArray(formData.groupby),
+            ],
+            series_columns: formData.groupby,
+            post_processing: [boxplotOperator(formData, baseQueryObject)],
+        });
+
+        // Query 1: Reference line values (just one row, all ref columns)
+        const referenceLines = formData.referenceLines || [];
+        const refFields = referenceLines
+            .filter(r => r.show && r.field)
+            .map(r => r.field);
+
+        if (refFields.length > 0) {
+            queries.push({
+                ...baseQueryObject,
+                columns: refFields,
+                metrics: undefined,
+                row_limit: 1,
+                orderby: [],
+            });
+        }
+
+        console.log('[SPCBoxPlot] Query count:', queries.length);
+        console.log('[SPCBoxPlot] Ref fields:', refFields);
+        return queries;
+    });
+}

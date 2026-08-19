@@ -1,0 +1,1779 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-02 10:00+0700\n"
+"PO-Revision-Date: 2026-07-02 10:00+0700\n"
+"Last-Translator: \n"
+"Language: vi\n"
+"Language-Team: vi <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "Home"
+msgstr "Trang chủ"
+
+msgid "Dashboards"
+msgstr "Bảng điều khiển"
+
+msgid "Charts"
+msgstr "Biểu đồ"
+
+msgid "Datasets"
+msgstr "Dữ liệu"
+
+msgid "SQL Lab"
+msgstr "SQL Lab"
+
+msgid "Settings"
+msgstr "Cài đặt"
+
+msgid "Logout"
+msgstr "Đăng xuất"
+
+msgid "Login"
+msgstr "Đăng nhập"
+
+msgid "Save"
+msgstr "Lưu"
+
+msgid "Cancel"
+msgstr "Hủy"
+
+msgid "Delete"
+msgstr "Xóa"
+
+msgid "Edit"
+msgstr "Chỉnh sửa"
+
+msgid "Add"
+msgstr "Thêm"
+
+msgid "Search"
+msgstr "Tìm kiếm"
+
+msgid "Filter"
+msgstr "Lọc"
+
+msgid "Apply"
+msgstr "Áp dụng"
+
+msgid "Reset"
+msgstr "Đặt lại"
+
+msgid "Close"
+msgstr "Đóng"
+
+msgid "Yes"
+msgstr "Có"
+
+msgid "No"
+msgstr "Không"
+
+msgid "OK"
+msgstr "Xác nhận"
+
+msgid "Error"
+msgstr "Lỗi"
+
+msgid "Loading..."
+msgstr "Đang tải..."
+
+msgid "Success"
+msgstr "Thành công"
+
+msgid "Warning"
+msgstr "Cảnh báo"
+
+msgid "Info"
+msgstr "Thông tin"
+
+msgid "Name"
+msgstr "Tên"
+
+msgid "Description"
+msgstr "Mô tả"
+
+msgid "Actions"
+msgstr "Thao tác"
+
+msgid "Owner"
+msgstr "Chủ sở hữu"
+
+msgid "Created"
+msgstr "Đã tạo"
+
+msgid "Modified"
+msgstr "Đã sửa"
+
+msgid "Status"
+msgstr "Trạng thái"
+
+msgid "Type"
+msgstr "Loại"
+
+msgid "Database"
+msgstr "Cơ sở dữ liệu"
+
+msgid "Schema"
+msgstr "Schema"
+
+msgid "Table"
+msgstr "Bảng"
+
+msgid "Column"
+msgstr "Cột"
+
+msgid "Row"
+msgstr "Dòng"
+
+msgid "Value"
+msgstr "Giá trị"
+
+msgid "Label"
+msgstr "Nhãn"
+
+msgid "Color"
+msgstr "Màu sắc"
+
+msgid "Size"
+msgstr "Kích thước"
+
+msgid "Title"
+msgstr "Tiêu đề"
+
+msgid "Refresh"
+msgstr "Làm mới"
+
+msgid "Download"
+msgstr "Tải xuống"
+
+msgid "Export"
+msgstr "Xuất"
+
+msgid "Import"
+msgstr "Nhập"
+
+msgid "Share"
+msgstr "Chia sẻ"
+
+msgid "Copy"
+msgstr "Sao chép"
+
+msgid "Paste"
+msgstr "Dán"
+
+msgid "Undo"
+msgstr "Hoàn tác"
+
+msgid "Redo"
+msgstr "Làm lại"
+
+msgid "Select"
+msgstr "Chọn"
+
+msgid "All"
+msgstr "Tất cả"
+
+msgid "None"
+msgstr "Không có"
+
+msgid "Clear"
+msgstr "Xóa trắng"
+
+msgid "Submit"
+msgstr "Gửi"
+
+msgid "Confirm"
+msgstr "Xác nhận"
+
+msgid "Back"
+msgstr "Quay lại"
+
+msgid "Next"
+msgstr "Tiếp theo"
+
+msgid "Previous"
+msgstr "Trước"
+
+msgid "Finish"
+msgstr "Hoàn tất"
+
+msgid "Run"
+msgstr "Chạy"
+
+msgid "Stop"
+msgstr "Dừng"
+
+msgid "Explore"
+msgstr "Khám phá"
+
+msgid "Preview"
+msgstr "Xem trước"
+
+msgid "View"
+msgstr "Xem"
+
+msgid "Create"
+msgstr "Tạo mới"
+
+msgid "Update"
+msgstr "Cập nhật"
+
+msgid "Duplicate"
+msgstr "Nhân bản"
+
+msgid "Move"
+msgstr "Di chuyển"
+
+msgid "Rename"
+msgstr "Đổi tên"
+
+msgid "Tag"
+msgstr "Thẻ"
+
+msgid "Sort"
+msgstr "Sắp xếp"
+
+msgid "Group by"
+msgstr "Nhóm theo"
+
+msgid "Order by"
+msgstr "Sắp xếp theo"
+
+msgid "Limit"
+msgstr "Giới hạn"
+
+msgid "Offset"
+msgstr "Độ lệch"
+
+msgid "Total"
+msgstr "Tổng"
+
+msgid "Average"
+msgstr "Trung bình"
+
+msgid "Count"
+msgstr "Đếm"
+
+msgid "Sum"
+msgstr "Tổng cộng"
+
+msgid "Min"
+msgstr "Nhỏ nhất"
+
+msgid "Max"
+msgstr "Lớn nhất"
+
+msgid "Metric"
+msgstr "Chỉ số"
+
+msgid "Dimension"
+msgstr "Chiều"
+
+msgid "Time"
+msgstr "Thời gian"
+
+msgid "Date"
+msgstr "Ngày"
+
+msgid "Year"
+msgstr "Năm"
+
+msgid "Month"
+msgstr "Tháng"
+
+msgid "Week"
+msgstr "Tuần"
+
+msgid "Day"
+msgstr "Ngày"
+
+msgid "Hour"
+msgstr "Giờ"
+
+msgid "Minute"
+msgstr "Phút"
+
+msgid "Second"
+msgstr "Giây"
+
+msgid "Rows"
+msgstr "Dòng"
+
+msgid "Columns"
+msgstr "Cột"
+
+msgid "Metrics"
+msgstr "Chỉ số"
+
+msgid "Chart"
+msgstr "Biểu đồ"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Query"
+msgstr "Truy vấn"
+
+msgid "Results"
+msgstr "Kết quả"
+
+msgid "Format"
+msgstr "Định dạng"
+
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+msgid "User"
+msgstr "Người dùng"
+
+msgid "Role"
+msgstr "Vai trò"
+
+msgid "Permission"
+msgstr "Quyền hạn"
+
+msgid "Security"
+msgstr "Bảo mật"
+
+msgid "Password"
+msgstr "Mật khẩu"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Profile"
+msgstr "Hồ sơ"
+
+msgid "My Dashboards"
+msgstr "Dashboard của tôi"
+
+msgid "SQL Query History"
+msgstr "Lịch sử truy vấn SQL"
+
+msgid "Restore"
+msgstr "Khôi phục"
+
+msgid "View SQL query history"
+msgstr "Xem lịch sử truy vấn SQL"
+
+msgid "No query history found for this dataset."
+msgstr "Không có lịch sử truy vấn cho dataset này."
+
+msgid "Copied!"
+msgstr "Đã sao chép!"
+
+msgid "Copy SQL"
+msgstr "Sao chép SQL"
+
+msgid "Restore this SQL to the editor"
+msgstr "Khôi phục SQL này vào editor"
+
+msgid "by"
+msgstr "bởi"
+
+msgid "Dataset"
+msgstr "Dữ liệu"
+
+msgid "Facility Status"
+msgstr "Trạng thái nhà máy"
+
+msgid "Upload"
+msgstr "Tải lên"
+
+msgid "Reload"
+msgstr "Tải lại"
+
+msgid "Enable"
+msgstr "Bật"
+
+msgid "Disable"
+msgstr "Tắt"
+
+msgid "Expand"
+msgstr "Mở rộng"
+
+msgid "Collapse"
+msgstr "Thu gọn"
+
+msgid "Show"
+msgstr "Hiển thị"
+
+msgid "Hide"
+msgstr "Ẩn"
+
+msgid "Owners"
+msgstr "Chủ sở hữu"
+
+msgid "SQL"
+msgstr "SQL"
+
+msgid "Tags"
+msgstr "Thẻ"
+
+msgid "Add a new dashboard"
+msgstr "Thêm dashboard mới"
+
+msgid "Edit dashboard"
+msgstr "Chỉnh sửa dashboard"
+
+msgid "Delete dashboard"
+msgstr "Xóa dashboard"
+
+msgid "Duplicate dashboard"
+msgstr "Nhân bản dashboard"
+
+msgid "Export dashboard"
+msgstr "Xuất dashboard"
+
+msgid "Import dashboard"
+msgstr "Nhập dashboard"
+
+msgid "Share dashboard"
+msgstr "Chia sẻ dashboard"
+
+msgid "Publish"
+msgstr "Công bố"
+
+msgid "Unpublish"
+msgstr "Hủy công bố"
+
+msgid "Published"
+msgstr "Đã công bố"
+
+msgid "Draft"
+msgstr "Bản nháp"
+
+msgid "Embedded"
+msgstr "Nhúng"
+
+msgid "Filters"
+msgstr "Bộ lọc"
+
+msgid "Add filter"
+msgstr "Thêm bộ lọc"
+
+msgid "Dashboard filters"
+msgstr "Bộ lọc dashboard"
+
+msgid "Cross-filter"
+msgstr "Lọc chéo"
+
+msgid "Apply filters"
+msgstr "Áp dụng bộ lọc"
+
+msgid "Clear filters"
+msgstr "Xóa bộ lọc"
+
+msgid "Edit chart"
+msgstr "Chỉnh sửa biểu đồ"
+
+msgid "Add chart"
+msgstr "Thêm biểu đồ"
+
+msgid "Add tab"
+msgstr "Thêm tab"
+
+msgid "Discard changes"
+msgstr "Hủy thay đổi"
+
+msgid "Save changes"
+msgstr "Lưu thay đổi"
+
+msgid "Undo last action"
+msgstr "Hoàn tác hành động cuối"
+
+msgid "Redo last action"
+msgstr "Làm lại hành động cuối"
+
+msgid "Tab title"
+msgstr "Tiêu đề tab"
+
+msgid "Add header"
+msgstr "Thêm tiêu đề"
+
+msgid "Add text"
+msgstr "Thêm văn bản"
+
+msgid "Add divider"
+msgstr "Thêm đường phân cách"
+
+msgid "Background color"
+msgstr "Màu nền"
+
+msgid "Dashboard title"
+msgstr "Tiêu đề dashboard"
+
+msgid "Certified"
+msgstr "Được chứng nhận"
+
+msgid "Certification details"
+msgstr "Chi tiết chứng nhận"
+
+msgid "Certified by"
+msgstr "Chứng nhận bởi"
+
+msgid "Modified by"
+msgstr "Sửa bởi"
+
+msgid "Created by"
+msgstr "Tạo bởi"
+
+msgid "Owned by"
+msgstr "Thuộc sở hữu của"
+
+msgid "Favorites"
+msgstr "Yêu thích"
+
+msgid "Mine"
+msgstr "Của tôi"
+
+msgid "Shared with me"
+msgstr "Được chia sẻ với tôi"
+
+msgid "All dashboards"
+msgstr "Tất cả dashboard"
+
+msgid "Add a new chart"
+msgstr "Thêm biểu đồ mới"
+
+msgid "Delete chart"
+msgstr "Xóa biểu đồ"
+
+msgid "Duplicate chart"
+msgstr "Nhân bản biểu đồ"
+
+msgid "Export chart"
+msgstr "Xuất biểu đồ"
+
+msgid "Explore chart"
+msgstr "Khám phá biểu đồ"
+
+msgid "Chart type"
+msgstr "Loại biểu đồ"
+
+msgid "Visualization type"
+msgstr "Loại biểu đồ"
+
+msgid "Chart title"
+msgstr "Tiêu đề biểu đồ"
+
+msgid "Chart data"
+msgstr "Dữ liệu biểu đồ"
+
+msgid "All charts"
+msgstr "Tất cả biểu đồ"
+
+msgid "Bar chart"
+msgstr "Biểu đồ cột"
+
+msgid "Line chart"
+msgstr "Biểu đồ đường"
+
+msgid "Pie chart"
+msgstr "Biểu đồ tròn"
+
+msgid "Area chart"
+msgstr "Biểu đồ diện tích"
+
+msgid "Scatter plot"
+msgstr "Biểu đồ phân tán"
+
+msgid "Heatmap"
+msgstr "Bản đồ nhiệt"
+
+msgid "Map"
+msgstr "Bản đồ"
+
+msgid "Pivot Table"
+msgstr "Bảng pivot"
+
+msgid "Big Number"
+msgstr "Số lớn"
+
+msgid "Gauge"
+msgstr "Đồng hồ đo"
+
+msgid "Treemap"
+msgstr "Bản đồ cây"
+
+msgid "Funnel"
+msgstr "Phễu"
+
+msgid "Histogram"
+msgstr "Biểu đồ tần số"
+
+msgid "Box plot"
+msgstr "Biểu đồ hộp"
+
+msgid "Sunburst"
+msgstr "Mặt trời"
+
+msgid "Calendar"
+msgstr "Lịch"
+
+msgid "Legend"
+msgstr "Chú thích"
+
+msgid "Tooltip"
+msgstr "Chú giải"
+
+msgid "Axis"
+msgstr "Trục"
+
+msgid "X-axis"
+msgstr "Trục X"
+
+msgid "Y-axis"
+msgstr "Trục Y"
+
+msgid "Series"
+msgstr "Chuỗi"
+
+msgid "No results"
+msgstr "Không có kết quả"
+
+msgid "No data"
+msgstr "Không có dữ liệu"
+
+msgid "New query"
+msgstr "Truy vấn mới"
+
+msgid "Run query"
+msgstr "Chạy truy vấn"
+
+msgid "Stop query"
+msgstr "Dừng truy vấn"
+
+msgid "Save query"
+msgstr "Lưu truy vấn"
+
+msgid "Create chart"
+msgstr "Tạo biểu đồ"
+
+msgid "Create dataset"
+msgstr "Tạo dữ liệu"
+
+msgid "Estimate cost"
+msgstr "Ước tính chi phí"
+
+msgid "Query history"
+msgstr "Lịch sử truy vấn"
+
+msgid "Saved queries"
+msgstr "Truy vấn đã lưu"
+
+msgid "Query results"
+msgstr "Kết quả truy vấn"
+
+msgid "Add a limit"
+msgstr "Thêm giới hạn"
+
+msgid "Select a database"
+msgstr "Chọn cơ sở dữ liệu"
+
+msgid "Select a schema"
+msgstr "Chọn schema"
+
+msgid "Select a table"
+msgstr "Chọn bảng"
+
+msgid "Table preview"
+msgstr "Xem trước bảng"
+
+msgid "Fetching query..."
+msgstr "Đang tải truy vấn..."
+
+msgid "Rows returned"
+msgstr "Dòng trả về"
+
+msgid "No rows returned"
+msgstr "Không có dòng nào"
+
+msgid "Query was successful"
+msgstr "Truy vấn thành công"
+
+msgid "Query error"
+msgstr "Lỗi truy vấn"
+
+msgid "Untitled query"
+msgstr "Truy vấn không tiêu đề"
+
+msgid "Tab"
+msgstr "Tab"
+
+msgid "Close tab"
+msgstr "Đóng tab"
+
+msgid "Duplicate tab"
+msgstr "Nhân bản tab"
+
+msgid "Add a new dataset"
+msgstr "Thêm dữ liệu mới"
+
+msgid "Edit dataset"
+msgstr "Chỉnh sửa dữ liệu"
+
+msgid "Delete dataset"
+msgstr "Xóa dữ liệu"
+
+msgid "Export dataset"
+msgstr "Xuất dữ liệu"
+
+msgid "Physical dataset"
+msgstr "Dữ liệu vật lý"
+
+msgid "Virtual dataset"
+msgstr "Dữ liệu ảo"
+
+msgid "Calculated column"
+msgstr "Cột tính toán"
+
+msgid "Calculated columns"
+msgstr "Cột tính toán"
+
+msgid "Source"
+msgstr "Nguồn"
+
+msgid "Datasource"
+msgstr "Nguồn dữ liệu"
+
+msgid "Data type"
+msgstr "Kiểu dữ liệu"
+
+msgid "Is dimension"
+msgstr "Là chiều"
+
+msgid "Is temporal"
+msgstr "Là thời gian"
+
+msgid "Is filterable"
+msgstr "Có thể lọc"
+
+msgid "Is active"
+msgstr "Đang hoạt động"
+
+msgid "All datasets"
+msgstr "Tất cả dữ liệu"
+
+msgid "Sync columns from source"
+msgstr "Đồng bộ cột từ nguồn"
+
+msgid "List users"
+msgstr "Danh sách người dùng"
+
+msgid "Add user"
+msgstr "Thêm người dùng"
+
+msgid "Edit user"
+msgstr "Chỉnh sửa người dùng"
+
+msgid "Delete user"
+msgstr "Xóa người dùng"
+
+msgid "List roles"
+msgstr "Danh sách vai trò"
+
+msgid "Add role"
+msgstr "Thêm vai trò"
+
+msgid "Edit role"
+msgstr "Chỉnh sửa vai trò"
+
+msgid "Delete role"
+msgstr "Xóa vai trò"
+
+msgid "List permissions"
+msgstr "Danh sách quyền hạn"
+
+msgid "Reset password"
+msgstr "Đặt lại mật khẩu"
+
+msgid "Change password"
+msgstr "Đổi mật khẩu"
+
+msgid "First name"
+msgstr "Tên"
+
+msgid "Last name"
+msgstr "Họ"
+
+msgid "Username"
+msgstr "Tên đăng nhập"
+
+msgid "Active"
+msgstr "Đang hoạt động"
+
+msgid "Inactive"
+msgstr "Không hoạt động"
+
+msgid "Admin"
+msgstr "Quản trị viên"
+
+msgid "Gamma"
+msgstr "Gamma"
+
+msgid "Alpha"
+msgstr "Alpha"
+
+msgid "Public"
+msgstr "Công khai"
+
+msgid "Add a new database"
+msgstr "Thêm cơ sở dữ liệu mới"
+
+msgid "Edit database"
+msgstr "Chỉnh sửa cơ sở dữ liệu"
+
+msgid "Delete database"
+msgstr "Xóa cơ sở dữ liệu"
+
+msgid "Test connection"
+msgstr "Kiểm tra kết nối"
+
+msgid "Connection"
+msgstr "Kết nối"
+
+msgid "Connect"
+msgstr "Kết nối"
+
+msgid "Disconnect"
+msgstr "Ngắt kết nối"
+
+msgid "Host"
+msgstr "Máy chủ"
+
+msgid "Port"
+msgstr "Cổng"
+
+msgid "Connection string"
+msgstr "Chuỗi kết nối"
+
+msgid "Display name"
+msgstr "Tên hiển thị"
+
+msgid "Additional parameters"
+msgstr "Tham số bổ sung"
+
+msgid "Alerts"
+msgstr "Cảnh báo"
+
+msgid "Reports"
+msgstr "Báo cáo"
+
+msgid "Alert"
+msgstr "Cảnh báo"
+
+msgid "Report"
+msgstr "Báo cáo"
+
+msgid "Add alert"
+msgstr "Thêm cảnh báo"
+
+msgid "Edit alert"
+msgstr "Chỉnh sửa cảnh báo"
+
+msgid "Delete alert"
+msgstr "Xóa cảnh báo"
+
+msgid "Add report"
+msgstr "Thêm báo cáo"
+
+msgid "Edit report"
+msgstr "Chỉnh sửa báo cáo"
+
+msgid "Delete report"
+msgstr "Xóa báo cáo"
+
+msgid "Schedule"
+msgstr "Lịch"
+
+msgid "Recipients"
+msgstr "Người nhận"
+
+msgid "Notification method"
+msgstr "Phương thức thông báo"
+
+msgid "Crontab"
+msgstr "Lịch cron"
+
+msgid "Condition"
+msgstr "Điều kiện"
+
+msgid "Threshold"
+msgstr "Ngưỡng"
+
+msgid "Last run"
+msgstr "Lần chạy cuối"
+
+msgid "Next run"
+msgstr "Lần chạy tiếp"
+
+msgid "Access"
+msgstr "Truy cập"
+
+msgid "Roles"
+msgstr "Vai trò"
+
+msgid "Permissions"
+msgstr "Quyền hạn"
+
+msgid "Row level security"
+msgstr "Bảo mật cấp dòng"
+
+msgid "RLS filter"
+msgstr "Bộ lọc RLS"
+
+msgid "Add RLS filter"
+msgstr "Thêm bộ lọc RLS"
+
+msgid "Edit RLS filter"
+msgstr "Chỉnh sửa bộ lọc RLS"
+
+msgid "Tables"
+msgstr "Bảng"
+
+msgid "Clause"
+msgstr "Điều khoản"
+
+msgid "Filter type"
+msgstr "Loại bộ lọc"
+
+msgid "Regular"
+msgstr "Thông thường"
+
+msgid "Base"
+msgstr "Cơ bản"
+
+msgid "Are you sure?"
+msgstr "Bạn có chắc không?"
+
+msgid "Are you sure you want to delete"
+msgstr "Bạn có chắc muốn xóa"
+
+msgid "This action cannot be undone."
+msgstr "Hành động này không thể hoàn tác."
+
+msgid "Could not load"
+msgstr "Không thể tải"
+
+msgid "An error occurred"
+msgstr "Đã xảy ra lỗi"
+
+msgid "Please try again"
+msgstr "Vui lòng thử lại"
+
+msgid "Not found"
+msgstr "Không tìm thấy"
+
+msgid "Forbidden"
+msgstr "Không được phép"
+
+msgid "Unauthorized"
+msgstr "Chưa xác thực"
+
+msgid "Access denied"
+msgstr "Từ chối truy cập"
+
+msgid "Something went wrong"
+msgstr "Có lỗi xảy ra"
+
+msgid "No results found"
+msgstr "Không tìm thấy kết quả"
+
+msgid "No records found"
+msgstr "Không có bản ghi nào"
+
+msgid "Page not found"
+msgstr "Không tìm thấy trang"
+
+msgid "Type to search"
+msgstr "Nhập để tìm kiếm"
+
+msgid "Select..."
+msgstr "Chọn..."
+
+msgid "Start typing to search..."
+msgstr "Bắt đầu gõ để tìm kiếm..."
+
+msgid "Loading"
+msgstr "Đang tải"
+
+msgid "Saving..."
+msgstr "Đang lưu..."
+
+msgid "Saved!"
+msgstr "Đã lưu!"
+
+msgid "Deleted!"
+msgstr "Đã xóa!"
+
+msgid "Updated!"
+msgstr "Đã cập nhật!"
+
+msgid "Created!"
+msgstr "Đã tạo!"
+
+msgid "more"
+msgstr "thêm"
+
+msgid "Less"
+msgstr "Thu gọn"
+
+msgid "More"
+msgstr "Xem thêm"
+
+msgid "Read more"
+msgstr "Đọc thêm"
+
+msgid "Show more"
+msgstr "Hiển thị thêm"
+
+msgid "Show less"
+msgstr "Hiển thị ít hơn"
+
+msgid "View all"
+msgstr "Xem tất cả"
+
+msgid "See all"
+msgstr "Xem tất cả"
+
+msgid "optional"
+msgstr "tùy chọn"
+
+msgid "required"
+msgstr "bắt buộc"
+
+msgid "Required"
+msgstr "Bắt buộc"
+
+msgid "Optional"
+msgstr "Tùy chọn"
+
+msgid "Default"
+msgstr "Mặc định"
+
+msgid "Custom"
+msgstr "Tùy chỉnh"
+
+msgid "Advanced"
+msgstr "Nâng cao"
+
+msgid "Basic"
+msgstr "Cơ bản"
+
+msgid "General"
+msgstr "Chung"
+
+msgid "Other"
+msgstr "Khác"
+
+msgid "New"
+msgstr "Mới"
+
+msgid "Old"
+msgstr "Cũ"
+
+msgid "Latest"
+msgstr "Mới nhất"
+
+msgid "Oldest"
+msgstr "Cũ nhất"
+
+msgid "Ascending"
+msgstr "Tăng dần"
+
+msgid "Descending"
+msgstr "Giảm dần"
+
+msgid "Asc"
+msgstr "Tăng dần"
+
+msgid "Desc"
+msgstr "Giảm dần"
+
+msgid "Last day"
+msgstr "Ngày qua"
+
+msgid "Last week"
+msgstr "Tuần qua"
+
+msgid "Last month"
+msgstr "Tháng qua"
+
+msgid "Last quarter"
+msgstr "Quý qua"
+
+msgid "Last year"
+msgstr "Năm qua"
+
+msgid "Last 7 days"
+msgstr "7 ngày qua"
+
+msgid "Last 28 days"
+msgstr "28 ngày qua"
+
+msgid "Last 30 days"
+msgstr "30 ngày qua"
+
+msgid "Last 90 days"
+msgstr "90 ngày qua"
+
+msgid "Last 365 days"
+msgstr "365 ngày qua"
+
+msgid "Today"
+msgstr "Hôm nay"
+
+msgid "Yesterday"
+msgstr "Hôm qua"
+
+msgid "This week"
+msgstr "Tuần này"
+
+msgid "This month"
+msgstr "Tháng này"
+
+msgid "This year"
+msgstr "Năm này"
+
+msgid "Previous week"
+msgstr "Tuần trước"
+
+msgid "Previous month"
+msgstr "Tháng trước"
+
+msgid "Previous year"
+msgstr "Năm trước"
+
+msgid "Custom range"
+msgstr "Phạm vi tùy chỉnh"
+
+msgid "Start date"
+msgstr "Ngày bắt đầu"
+
+msgid "End date"
+msgstr "Ngày kết thúc"
+
+msgid "Start time"
+msgstr "Thời gian bắt đầu"
+
+msgid "End time"
+msgstr "Thời gian kết thúc"
+
+msgid "Date range"
+msgstr "Khoảng ngày"
+
+msgid "Time range"
+msgstr "Khoảng thời gian"
+
+msgid "Time grain"
+msgstr "Độ chi tiết thời gian"
+
+msgid "No filter"
+msgstr "Không lọc"
+
+msgid "Midnight"
+msgstr "Nửa đêm"
+
+msgid "Noon"
+msgstr "Buổi trưa"
+
+msgid "Aggregation"
+msgstr "Tổng hợp"
+
+msgid "Group By"
+msgstr "Nhóm theo"
+
+msgid "Not grouped"
+msgstr "Không nhóm"
+
+msgid "Breakdowns"
+msgstr "Phân tích"
+
+msgid "Breakdown"
+msgstr "Phân tích"
+
+msgid "Entity"
+msgstr "Thực thể"
+
+msgid "X Axis"
+msgstr "Trục X"
+
+msgid "Y Axis"
+msgstr "Trục Y"
+
+msgid "X axis label"
+msgstr "Nhãn trục X"
+
+msgid "Y axis label"
+msgstr "Nhãn trục Y"
+
+msgid "X axis format"
+msgstr "Định dạng trục X"
+
+msgid "Y axis format"
+msgstr "Định dạng trục Y"
+
+msgid "Show legend"
+msgstr "Hiện chú thích"
+
+msgid "Show labels"
+msgstr "Hiện nhãn"
+
+msgid "Show values"
+msgstr "Hiện giá trị"
+
+msgid "Show tooltip"
+msgstr "Hiện chú giải"
+
+msgid "Stack series"
+msgstr "Xếp chồng chuỗi"
+
+msgid "Sort bars"
+msgstr "Sắp xếp cột"
+
+msgid "Sort descending"
+msgstr "Sắp xếp giảm dần"
+
+msgid "Color scheme"
+msgstr "Bảng màu"
+
+msgid "Opacity"
+msgstr "Độ mờ"
+
+msgid "Transparency"
+msgstr "Độ trong suốt"
+
+msgid "Row limit"
+msgstr "Giới hạn dòng"
+
+msgid "Number format"
+msgstr "Định dạng số"
+
+msgid "Date format"
+msgstr "Định dạng ngày"
+
+msgid "Currency"
+msgstr "Tiền tệ"
+
+msgid "Prefix"
+msgstr "Tiền tố"
+
+msgid "Suffix"
+msgstr "Hậu tố"
+
+msgid "Comparison"
+msgstr "So sánh"
+
+msgid "Trend"
+msgstr "Xu hướng"
+
+msgid "Percentage"
+msgstr "Phần trăm"
+
+msgid "Rolling average"
+msgstr "Trung bình động"
+
+msgid "Cumulative"
+msgstr "Tích lũy"
+
+msgid "Moving average"
+msgstr "Trung bình di động"
+
+msgid "Window"
+msgstr "Cửa sổ"
+
+msgid "Contribution"
+msgstr "Đóng góp"
+
+msgid "Normalize"
+msgstr "Chuẩn hóa"
+
+msgid "Annotation"
+msgstr "Chú thích"
+
+msgid "Annotations"
+msgstr "Chú thích"
+
+msgid "Layer"
+msgstr "Lớp"
+
+msgid "Layers"
+msgstr "Lớp"
+
+msgid "Filter value"
+msgstr "Giá trị bộ lọc"
+
+msgid "Is equal to"
+msgstr "Bằng"
+
+msgid "Is not equal to"
+msgstr "Không bằng"
+
+msgid "Is greater than"
+msgstr "Lớn hơn"
+
+msgid "Is less than"
+msgstr "Nhỏ hơn"
+
+msgid "Is greater than or equal to"
+msgstr "Lớn hơn hoặc bằng"
+
+msgid "Is less than or equal to"
+msgstr "Nhỏ hơn hoặc bằng"
+
+msgid "Is between"
+msgstr "Nằm trong khoảng"
+
+msgid "Is in"
+msgstr "Thuộc"
+
+msgid "Is not in"
+msgstr "Không thuộc"
+
+msgid "Contains"
+msgstr "Chứa"
+
+msgid "Not contains"
+msgstr "Không chứa"
+
+msgid "Starts with"
+msgstr "Bắt đầu với"
+
+msgid "Ends with"
+msgstr "Kết thúc với"
+
+msgid "Is null"
+msgstr "Là null"
+
+msgid "Is not null"
+msgstr "Không null"
+
+msgid "Is true"
+msgstr "Là đúng"
+
+msgid "Is false"
+msgstr "Là sai"
+
+msgid "Import file"
+msgstr "Nhập file"
+
+msgid "Export file"
+msgstr "Xuất file"
+
+msgid "Download CSV"
+msgstr "Tải CSV"
+
+msgid "Download Excel"
+msgstr "Tải Excel"
+
+msgid "Download image"
+msgstr "Tải ảnh"
+
+msgid "Download PDF"
+msgstr "Tải PDF"
+
+msgid "Import CSV"
+msgstr "Nhập CSV"
+
+msgid "Import Excel"
+msgstr "Nhập Excel"
+
+msgid "Overwrite existing"
+msgstr "Ghi đè hiện có"
+
+msgid "File"
+msgstr "File"
+
+msgid "file"
+msgstr "file"
+
+msgid "Delimiter"
+msgstr "Dấu phân cách"
+
+msgid "Encoding"
+msgstr "Mã hóa"
+
+msgid "Header row"
+msgstr "Dòng tiêu đề"
+
+msgid "Index column"
+msgstr "Cột chỉ mục"
+
+msgid "Null values"
+msgstr "Giá trị null"
+
+msgid "Superset"
+msgstr "Superset"
+
+msgid "Apache Superset"
+msgstr "Apache Superset"
+
+msgid "Version"
+msgstr "Phiên bản"
+
+msgid "About"
+msgstr "Giới thiệu"
+
+msgid "Documentation"
+msgstr "Tài liệu"
+
+msgid "Feedback"
+msgstr "Phản hồi"
+
+msgid "Report issue"
+msgstr "Báo cáo sự cố"
+
+msgid "Keyboard shortcuts"
+msgstr "Phím tắt"
+
+msgid "Toggle fullscreen"
+msgstr "Toàn màn hình"
+
+msgid "Fullscreen"
+msgstr "Toàn màn hình"
+
+msgid "Exit fullscreen"
+msgstr "Thoát toàn màn hình"
+
+msgid "Theme"
+msgstr "Giao diện"
+
+msgid "Dark mode"
+msgstr "Chế độ tối"
+
+msgid "Light mode"
+msgstr "Chế độ sáng"
+
+msgid "System"
+msgstr "Hệ thống"
+
+msgid "Log out"
+msgstr "Đăng xuất"
+
+msgid "Log in"
+msgstr "Đăng nhập"
+
+msgid "Sign in"
+msgstr "Đăng nhập"
+
+msgid "Sign up"
+msgstr "Đăng ký"
+
+msgid "Forgot password"
+msgstr "Quên mật khẩu"
+
+msgid "Remember me"
+msgstr "Ghi nhớ đăng nhập"
+
+msgid "Two-factor authentication"
+msgstr "Xác thực hai yếu tố"
+
+msgid "Manage"
+msgstr "Quản lý"
+
+msgid "Data"
+msgstr "Dữ liệu"
+
+msgid "Annotations and layers"
+msgstr "Chú thích và lớp"
+
+msgid "CSS templates"
+msgstr "Mẫu CSS"
+
+msgid "Template"
+msgstr "Mẫu"
+
+msgid "Templates"
+msgstr "Mẫu"
+
+msgid "Welcome"
+msgstr "Chào mừng"
+
+msgid "Welcome to Apache Superset"
+msgstr "Chào mừng đến với Apache Superset"
+
+msgid "Recents"
+msgstr "Gần đây"
+
+msgid "Recent"
+msgstr "Gần đây"
+
+msgid "Edited"
+msgstr "Đã chỉnh sửa"
+
+msgid "Viewed"
+msgstr "Đã xem"
+
+msgid "Last modified"
+msgstr "Sửa lần cuối"
+
+msgid "Last viewed"
+msgstr "Xem lần cuối"
+
+msgid "Last created"
+msgstr "Tạo lần cuối"
+
+msgid "Examples"
+msgstr "Ví dụ"
+
+msgid "Tutorial"
+msgstr "Hướng dẫn"
+
+msgid "Tour"
+msgstr "Khám phá"
+
+msgid "Help"
+msgstr "Trợ giúp"
+
+msgid "Minimize"
+msgstr "Thu nhỏ"
+
+msgid "Maximize"
+msgstr "Phóng to"
+
+msgid "Resize"
+msgstr "Thay đổi kích thước"
+
+msgid "Pin"
+msgstr "Ghim"
+
+msgid "Unpin"
+msgstr "Bỏ ghim"
+
+msgid "Lock"
+msgstr "Khóa"
+
+msgid "Unlock"
+msgstr "Mở khóa"
+
+msgid "Approve"
+msgstr "Phê duyệt"
+
+msgid "Reject"
+msgstr "Từ chối"
+
+msgid "Pending"
+msgstr "Đang chờ"
+
+msgid "In progress"
+msgstr "Đang xử lý"
+
+msgid "Complete"
+msgstr "Hoàn thành"
+
+msgid "Completed"
+msgstr "Đã hoàn thành"
+
+msgid "Failed"
+msgstr "Thất bại"
+
+msgid "Cancelled"
+msgstr "Đã hủy"
+
+msgid "Expired"
+msgstr "Đã hết hạn"
+
+msgid "Running"
+msgstr "Đang chạy"
+
+msgid "Queued"
+msgstr "Đang chờ hàng"
+
+msgid "Scheduled"
+msgstr "Đã lên lịch"
+
+msgid "Unknown"
+msgstr "Không xác định"
+
+msgid "String"
+msgstr "Chuỗi"
+
+msgid "Integer"
+msgstr "Số nguyên"
+
+msgid "Float"
+msgstr "Số thực"
+
+msgid "Boolean"
+msgstr "Boolean"
+
+msgid "Datetime"
+msgstr "Ngày giờ"
+
+msgid "Timestamp"
+msgstr "Dấu thời gian"
+
+msgid "Decimal"
+msgstr "Thập phân"
+
+msgid "Number"
+msgstr "Số"
+
+msgid "Text"
+msgstr "Văn bản"
+
+msgid "JSON"
+msgstr "JSON"
+
+msgid "Array"
+msgstr "Mảng"
+
+msgid "Object"
+msgstr "Đối tượng"
+
+msgid "Null"
+msgstr "Null"
+
+msgid "Values"
+msgstr "Giá trị"
+
+msgid "Aggregation function"
+msgstr "Hàm tổng hợp"
+
+msgid "Count Unique Values"
+msgstr "Đếm giá trị duy nhất"
+
+msgid "List Unique Values"
+msgstr "Liệt kê giá trị duy nhất"
+
+msgid "Median"
+msgstr "Trung vị"
+
+msgid "Sample Variance"
+msgstr "Phương sai mẫu"
+
+msgid "Sample Standard Deviation"
+msgstr "Độ lệch chuẩn mẫu"
+
+msgid "Minimum"
+msgstr "Nhỏ nhất"
+
+msgid "Maximum"
+msgstr "Lớn nhất"
+
+msgid "First"
+msgstr "Đầu tiên"
+
+msgid "Last"
+msgstr "Cuối cùng"
+
+msgid "Subtotals"
+msgstr "Tổng phụ"
+
+msgid "Totals"
+msgstr "Tổng"
+
+msgid "Row Totals"
+msgstr "Tổng hàng"
+
+msgid "Column Totals"
+msgstr "Tổng cột"
+
+msgid "Apply metrics on"
+msgstr "Áp dụng chỉ số trên"
+
+msgid "Rows (Top levels)"
+msgstr "Hàng (cấp trên)"
+
+msgid "Month Range"
+msgstr "Khoảng tháng"
+
+msgid "From"
+msgstr "Từ"
+
+msgid "To"
+msgstr "Đến"
+
+msgid "Select month"
+msgstr "Chọn tháng"
+
+msgid "January"
+msgstr "Tháng 1"
+
+msgid "February"
+msgstr "Tháng 2"
+
+msgid "March"
+msgstr "Tháng 3"
+
+msgid "April"
+msgstr "Tháng 4"
+
+msgid "May"
+msgstr "Tháng 5"
+
+msgid "June"
+msgstr "Tháng 6"
+
+msgid "July"
+msgstr "Tháng 7"
+
+msgid "August"
+msgstr "Tháng 8"
+
+msgid "September"
+msgstr "Tháng 9"
+
+msgid "October"
+msgstr "Tháng 10"
+
+msgid "November"
+msgstr "Tháng 11"
+
+msgid "December"
+msgstr "Tháng 12"
+
+msgid "Jan"
+msgstr "Th1"
+
+msgid "Feb"
+msgstr "Th2"
+
+msgid "Mar"
+msgstr "Th3"
+
+msgid "Apr"
+msgstr "Th4"
+
+msgid "Jun"
+msgstr "Th6"
+
+msgid "Jul"
+msgstr "Th7"
+
+msgid "Aug"
+msgstr "Th8"
+
+msgid "Sep"
+msgstr "Th9"
+
+msgid "Oct"
+msgstr "Th10"
+
+msgid "Nov"
+msgstr "Th11"
+
+msgid "Dec"
+msgstr "Th12"
+
