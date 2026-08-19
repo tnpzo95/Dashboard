@@ -74,7 +74,7 @@
     "antd": "^6.4.3",
     "baseline-browser-mapping": "^2.10.30",
     "caniuse-lite": "^1.0.30001793",
-    "docusaurus-plugin-openapi-docs": "^5.0.2",
+    "docusaurus-plugin-openapi-docs": "^5.2.0",
     "docusaurus-theme-openapi-docs": "^5.0.2",
     "js-yaml": "^4.1.1",
     "js-yaml-loader": "^1.2.2",
