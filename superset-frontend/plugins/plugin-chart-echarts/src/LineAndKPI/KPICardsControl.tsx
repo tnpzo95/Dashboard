@@ -401,6 +401,38 @@ function KPICardEditForm({
                     allowClear
                 />
             </FormField>
+            <FormField>
+                {t('Title Font Size (px)')}
+                <Input
+                    type="number"
+                    min={1}
+                    value={card.titleFontSize ?? ''}
+                    onChange={e =>
+                        onChange({
+                            titleFontSize: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                        })
+                    }
+                    placeholder={t('Default')}
+                />
+            </FormField>
+            <FormField>
+                {t('Value Font Size (px)')}
+                <Input
+                    type="number"
+                    min={1}
+                    value={card.valueFontSize ?? ''}
+                    onChange={e =>
+                        onChange({
+                            valueFontSize: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                        })
+                    }
+                    placeholder={t('Default')}
+                />
+            </FormField>
             <InlineField>
                 <span>{t('Border Color')}</span>
                 <ColorInput

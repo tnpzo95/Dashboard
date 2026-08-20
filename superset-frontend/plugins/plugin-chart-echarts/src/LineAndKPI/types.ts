@@ -43,6 +43,10 @@ export interface KPICardConfig {
     // Per-card d3-format string; falls back to the chart-level Number
     // format (yAxisFormat) when unset.
     numberFormat?: string;
+    // Per-card font sizes; fall back to the chart-level KPI font settings
+    // (kpiTitleFontSize / theme default) when unset.
+    titleFontSize?: number;
+    valueFontSize?: number;
 }
 
 export type LineAndKPIFormData = QueryFormData & {
@@ -103,6 +107,8 @@ export interface KPIItem {
     title: string;
     value: string;
     borderColor?: string;
+    titleFontSize?: number;
+    valueFontSize?: number;
 }
 
 export type LineAndKPIVizProps = {

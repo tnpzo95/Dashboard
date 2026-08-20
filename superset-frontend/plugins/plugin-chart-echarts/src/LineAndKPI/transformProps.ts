@@ -20,6 +20,9 @@ import {
     getMetricLabel,
     getNumberFormatter,
     getValueFormatter,
+    getTimeFormatter,
+    SMART_DATE_ID,
+    isAdhocMetricSimple,
 } from '@superset-ui/core';
 import { LineAndKPIChartProps, LineAndKPIVizProps, KPIItem } from './types';
 import { Refs } from '../types';
@@ -43,8 +46,17 @@ export default function transformProps(
             currencyFormats = {},
             columnFormats = {},
             currencyCodeColumn,
+            columns: datasourceColumns = [],
         },
     } = chartProps;
+
+    // Columns flagged as temporal (date/time) in the datasource, so KPI
+    // cards pointing at them can be formatted as dates instead of numbers.
+    const dttmColumnNames = new Set(
+        (datasourceColumns || [])
+            .filter((col: any) => col.is_dttm)
+            .map((col: any) => col.column_name),
+    );
     const {
         metrics = [],
         yAxisFormat,
@@ -238,11 +250,20 @@ export default function transformProps(
                     ? card.metric
                     : card.metric.label || getMetricLabel(card.metric)
                 : undefined;
-            const { borderColor } = card;
+            const { borderColor, titleFontSize, valueFontSize } = card;
             const dataSource = card.queryIndex === 0 ? timeSeriesData : aggregatedData;
 
+            // Detect whether this card's metric points at a temporal column,
+            // so its value is date-formatted instead of number-formatted.
+            const metricColumnName = isAdhocMetricSimple(card.metric)
+                ? card.metric.column.column_name || card.metric.column.columnName
+                : undefined;
+            const isDateColumn = metricColumnName
+                ? dttmColumnNames.has(metricColumnName)
+                : false;
+
             if (!metricLabel || dataSource.length === 0) {
-                return { title: card.title, value: '—', borderColor };
+                return { title: card.title, value: '—', borderColor, titleFontSize, valueFontSize };
             }
 
             // Get the last row for time series, first row for aggregated
@@ -253,7 +274,52 @@ export default function transformProps(
             const value = row[metricLabel];
 
             if (value === null || value === undefined) {
-                return { title: card.title, value: '—', borderColor };
+                return { title: card.title, value: '—', borderColor, titleFontSize, valueFontSize };
+            }
+
+            // Temporal columns get date-formatted (smart_date by default,
+            // or a d3-time format string typed into the Number Format
+            // field), never run through the number formatter.
+            if (isDateColumn) {
+                const timeFormatter = getTimeFormatter(card.numberFormat || SMART_DATE_ID);
+                const dateValue =
+                    typeof value === 'number' ? value : new Date(value as string).getTime();
+                try {
+                    return {
+                        title: card.title,
+                        value: Number.isNaN(dateValue)
+                            ? String(value)
+                            : String(timeFormatter(dateValue)),
+                        borderColor,
+                        titleFontSize,
+                        valueFontSize,
+                    };
+                } catch {
+                    return {
+                        title: card.title,
+                        value: String(value),
+                        borderColor,
+                        titleFontSize,
+                        valueFontSize,
+                    };
+                }
+            }
+
+            // Only numeric values should go through the number formatter.
+            // Text/date columns picked as the KPI metric should just be
+            // displayed as-is, otherwise the formatter turns them into NaN.
+            const isNumeric =
+                typeof value === 'number' ||
+                (typeof value === 'string' && value.trim() !== '' && !Number.isNaN(Number(value)));
+
+            if (!isNumeric) {
+                return {
+                    title: card.title,
+                    value: String(value),
+                    borderColor,
+                    titleFontSize,
+                    valueFontSize,
+                };
             }
 
             const numberFormatter = getValueFormatter(
@@ -273,9 +339,17 @@ export default function transformProps(
                     title: card.title,
                     value: String(numberFormatter(value as number)),
                     borderColor,
+                    titleFontSize,
+                    valueFontSize,
                 };
             } catch {
-                return { title: card.title, value: String(value), borderColor };
+                return {
+                    title: card.title,
+                    value: String(value),
+                    borderColor,
+                    titleFontSize,
+                    valueFontSize,
+                };
             }
         });
 

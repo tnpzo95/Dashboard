@@ -97,10 +97,10 @@ const KPITitle = styled.div<{ titleColor?: string; titleFontSize?: number }>`
     `}
 `;
 
-const KPIValue = styled.div<{ valueColor?: string }>`
-    ${({ theme, valueColor }) => `
+const KPIValue = styled.div<{ valueColor?: string; valueFontSize?: number }>`
+    ${({ theme, valueColor, valueFontSize }) => `
         color: ${valueColor || theme.colorText};
-        font-size: ${theme.fontSizeXXL}px;
+        font-size: ${valueFontSize ?? theme.fontSizeXXL}px;
         font-weight: ${theme.fontWeightBold};
         white-space: nowrap;
         overflow: hidden;
@@ -158,15 +158,18 @@ function LineAndKPIViz({
                                 borderColor={kpi.borderColor}
                                 titleColor={kpiTitleColor}
                                 valueColor={kpiValueColor}
-                                titleFontSize={kpiTitleFontSize}
+                                titleFontSize={kpi.titleFontSize ?? kpiTitleFontSize}
                             >
                                 <KPITitle
                                     titleColor={kpiTitleColor}
-                                    titleFontSize={kpiTitleFontSize}
+                                    titleFontSize={kpi.titleFontSize ?? kpiTitleFontSize}
                                 >
                                     {kpi.title}
                                 </KPITitle>
-                                <KPIValue valueColor={kpiValueColor}>
+                                <KPIValue
+                                    valueColor={kpiValueColor}
+                                    valueFontSize={kpi.valueFontSize}
+                                >
                                     {kpi.value}
                                 </KPIValue>
                             </KPICard>
