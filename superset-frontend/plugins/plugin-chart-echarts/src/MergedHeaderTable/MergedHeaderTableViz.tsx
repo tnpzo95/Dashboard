@@ -60,14 +60,41 @@ const Wrapper = styled.div<{
         }
         .ant-table-tbody > tr > td {
             text-align: center;
+            /* Pinned (sticky) columns rely on their cell having an opaque
+               background -- otherwise unpinned columns scrolled underneath
+               show through and their text visually overlaps the pinned
+               column's text. Set it explicitly (with !important below for
+               subtotal/total rows) instead of relying on antd's default,
+               which doesn't always resolve to an opaque color here. */
+            background: ${theme.colorBgContainer};
         }
-        .mht-subtotal-row > td {
+        .ant-table-tbody > tr.mht-subtotal-row > td {
             font-weight: ${theme.fontWeightStrong};
-            background: ${theme.colorFillTertiary};
+            /* colorFillTertiary is a translucent "fill" token (e.g.
+               rgba(255,255,255,0.08) in dark mode) meant to be layered on
+               top of a background, not used standalone -- alone it lets
+               pinned columns' underlying scrolled content show through.
+               Painting it as a background-image layer over an opaque
+               background-color flattens both into one opaque result. */
+            background-color: ${theme.colorBgContainer} !important;
+            background-image: linear-gradient(
+                ${theme.colorFillTertiary},
+                ${theme.colorFillTertiary}
+            ) !important;
         }
-        .mht-total-row > td {
+        .ant-table-tbody > tr.mht-total-row > td {
             font-weight: ${theme.fontWeightStrong};
-            background: ${theme.colorFillSecondary};
+            background-color: ${theme.colorBgContainer} !important;
+            background-image: linear-gradient(
+                ${theme.colorFillSecondary},
+                ${theme.colorFillSecondary}
+            ) !important;
+        }
+        /* Auto-inserted "Subtotal" column of a multi-level pivot -- bold it
+           so it stands out from the regular leaf columns next to it. */
+        .ant-table-tbody > tr > td.mht-subtotal-col,
+        .ant-table-thead > tr > th.mht-subtotal-col {
+            font-weight: ${theme.fontWeightStrong};
         }
     `}
 `;
@@ -79,9 +106,40 @@ const ErrorMessage = styled.div`
     `}
 `;
 
+// Compares two rows by `dataIndex`'s value, but only within the same
+// sort-scope group (every column in `groupColumns` matching -- an empty
+// array means "the whole table is one group", i.e. sort freely). Rows in
+// different groups, and any subtotal/total row (which repeats its group's
+// own values, so it would otherwise look "same group" too), are left in
+// their original relative order by returning 0, which a stable sort
+// (guaranteed by the spec since ES2019) keeps exactly where they were. This
+// lets a user sort within a block without breaking that block's position,
+// its rowSpan merge, or subtotal/total rows.
+function makeGroupSorter(
+    dataIndex: string,
+    groupColumns: string[],
+): (a: MergedHeaderTableDatum, b: MergedHeaderTableDatum) => number {
+    return (a, b) => {
+        if (a[ROW_TYPE_KEY] || b[ROW_TYPE_KEY]) {
+            return 0;
+        }
+        const sameGroup = groupColumns.every(col => a[col] === b[col]);
+        if (!sameGroup) {
+            return 0;
+        }
+        const av = a[dataIndex];
+        const bv = b[dataIndex];
+        if (typeof av === 'number' && typeof bv === 'number') {
+            return av - bv;
+        }
+        return String(av ?? '').localeCompare(String(bv ?? ''));
+    };
+}
+
 function buildColumns(
     nodes: HeaderNode[],
     parentPath: string,
+    sortGroupColumns?: string[],
 ): ColumnsType<MergedHeaderTableDatum> {
     return nodes.map((node, index) => {
         const path = `${parentPath}-${index}`;
@@ -90,7 +148,7 @@ function buildColumns(
                 title: node.label,
                 key: path,
                 align: node.align || 'center',
-                children: buildColumns(node.children, path),
+                children: buildColumns(node.children, path, sortGroupColumns),
             };
         }
         const dataIndex = node.column ? getFormColumnLabel(node.column) : path;
@@ -101,6 +159,10 @@ function buildColumns(
             dataIndex,
             align: node.align || 'right',
             width: node.width,
+            className: node.isSubtotalColumn ? 'mht-subtotal-col' : undefined,
+            sorter: sortGroupColumns
+                ? makeGroupSorter(dataIndex, sortGroupColumns)
+                : undefined,
             render: (value: unknown) => renderFormattedValue(value, formatter),
         };
     });
@@ -153,6 +215,7 @@ function MergedHeaderTableViz({
     mergeRowHeaders,
     bordered,
     cellFontSize,
+    enableColumnSort,
     error,
 }: MergedHeaderTableVizProps) {
     if (error) {
@@ -163,6 +226,24 @@ function MergedHeaderTableViz({
         );
     }
 
+    // Sorting is scoped to whichever Row Header group the user has already
+    // marked meaningful via "Subtotal" (Row Header Column Format) -- rows
+    // are only reordered among others sharing the same values for every
+    // column up to and including that leftmost subtotal-triggering column,
+    // since that's exactly the group a subtotal row sums (order-independent)
+    // and its boundary the subtotal row already sits at. If no column has
+    // Subtotal enabled, there's no boundary to respect, so sort applies
+    // across the whole table.
+    const subtotalBoundaryIndex = rowHeaderColumns.findIndex(
+        col => rowHeaderColumnFormats?.[col]?.subtotal,
+    );
+    const sortGroupColumns = enableColumnSort
+        ? rowHeaderColumns.slice(
+              0,
+              subtotalBoundaryIndex === -1 ? 0 : subtotalBoundaryIndex + 1,
+          )
+        : undefined;
+
     const columns: ColumnsType<MergedHeaderTableDatum> = [
         ...buildRowHeaderColumns(
             rowHeaderColumns,
@@ -170,7 +251,7 @@ function MergedHeaderTableViz({
             data,
             rowHeaderColumnFormats || {},
         ),
-        ...buildColumns(headerTree, 'col'),
+        ...buildColumns(headerTree, 'col', sortGroupColumns),
     ];
 
     return (

@@ -23,17 +23,38 @@ import {
 } from '@superset-ui/core';
 import { BaseChartProps } from '../types';
 
-// Auto-generate one merged sub-column per distinct value found in
-// `pivotColumn` (e.g. one column per day), each showing `valueColumn`'s
-// value for that row/pivot-value combination — a dynamic alternative to
-// manually listing every column in the JSON.
+// Auto-generate merged sub-columns per distinct value(s) found in
+// `pivotColumns` (e.g. one nested group per month, then week, then a leaf
+// column per day), each leaf showing `valueColumn`'s value for that
+// row/pivot-path combination — a dynamic alternative to manually listing
+// every column (and every group level) in the JSON.
 export interface HeaderPivotConfig {
+    // Deprecated single-level field, kept only so header trees saved before
+    // multi-level pivot was added keep working. New/edited pivots should use
+    // `pivotColumns` instead -- see getPivotColumns() in headerTreeUtils.
     pivotColumn?: QueryFormColumn;
+    // Ordered list of columns to pivot by, outermost group first (e.g.
+    // [month, week, date] nests month > week > date group headers, with
+    // date as the leaf level). A single entry behaves like the old
+    // single-level `pivotColumn`.
+    pivotColumns?: QueryFormColumn[];
     valueColumn?: QueryFormColumn;
-    // Optional time/number format applied to the pivot values themselves
-    // when used as the auto-generated sub-column labels.
+    // Optional time/number format applied to the leaf level's pivot values
+    // only (the deepest group), when used as the auto-generated leaf-column
+    // labels. Intermediate group levels are shown as plain text.
     labelFormat?: string;
     sortDescending?: boolean;
+    // Insert an extra "Subtotal" leaf column as the last child of every
+    // intermediate group level (e.g. one Subtotal column after each Week's
+    // dates, summing that week, and another after each Month's weeks),
+    // mirroring the standard PivotTable chart's "Show columns subtotal".
+    colSubtotals?: boolean;
+    // Append one extra "Total" column after the very last top-level group
+    // (e.g. after the last Month), summing every leaf value in the whole
+    // pivot -- the outermost level has no enclosing group to attach its own
+    // subtotal to, so this is its equivalent, mirroring the standard
+    // PivotTable chart's "Show columns total".
+    colGrandTotal?: boolean;
 }
 
 // A node in the manually-declared header tree.
@@ -51,6 +72,10 @@ export interface HeaderNode {
     align?: 'left' | 'center' | 'right';
     width?: number;
     children?: HeaderNode[];
+    // Internal flag set by resolvePivotNode on the "Subtotal" leaf it
+    // auto-inserts for `pivot.colSubtotals` -- never set from the JSON/UI --
+    // so MergedHeaderTableViz can bold that column.
+    isSubtotalColumn?: boolean;
 }
 
 export interface HeaderTreeConfig {
@@ -93,6 +118,7 @@ export type MergedHeaderTableFormData = QueryFormData & {
     numberFormat?: string;
     rowHeaderColumnFormats?: RowHeaderColumnFormats;
     showGrandTotal?: boolean;
+    enableColumnSort?: boolean;
 };
 
 export interface MergedHeaderTableDatum {
@@ -120,5 +146,6 @@ export interface MergedHeaderTableVizProps {
     mergeRowHeaders?: boolean;
     bordered?: boolean;
     cellFontSize?: number;
+    enableColumnSort?: boolean;
     error?: string;
 }

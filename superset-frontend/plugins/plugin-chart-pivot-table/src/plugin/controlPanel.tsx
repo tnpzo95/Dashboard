@@ -36,6 +36,7 @@ import {
 import { MetricsLayoutEnum } from '../types';
 import RowColumnFormatControl from './RowColumnFormatControl';
 import MetricColumnWidthControl from './MetricColumnWidthControl';
+import ColumnColumnFormatControl from './ColumnColumnFormatControl';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -264,6 +265,27 @@ const config: ControlPanelConfig = {
                 metrics: controls?.metrics?.value || [],
               }),
               rerender: ['metrics'],
+            },
+          },
+        ],
+        [
+          {
+            name: 'columnColumnFormats',
+            config: {
+              type: ColumnColumnFormatControl,
+              label: t('Column Width & Align'),
+              default: {},
+              renderTrigger: true,
+              description: t(
+                'Optionally set a fixed width (px) and/or text alignment ' +
+                'for the leaf-level data columns under each Columns ' +
+                'attribute (e.g. each individual date column of a date ' +
+                'grouping).',
+              ),
+              mapStateToProps: ({ controls }: { controls: any }) => ({
+                groupbyColumns: controls?.groupbyColumns?.value || [],
+              }),
+              rerender: ['groupbyColumns'],
             },
           },
         ],

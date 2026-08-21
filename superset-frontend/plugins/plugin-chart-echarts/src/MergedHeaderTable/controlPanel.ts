@@ -162,6 +162,26 @@ export default {
                 ],
                 [
                     {
+                        name: 'enableColumnSort',
+                        config: {
+                            type: 'CheckboxControl',
+                            label: t('Enable Column Sort'),
+                            renderTrigger: true,
+                            default: false,
+                            description: t(
+                                'Let users click a data column\'s header to sort. ' +
+                                'If any Row Header Column has "Subtotal" enabled ' +
+                                '(Row Header Column Format), sorting only reorders ' +
+                                'rows within that same subtotal group, leaving ' +
+                                'groups, merged cells and subtotal/total rows in ' +
+                                'place. With no Subtotal configured, sorting ' +
+                                'applies to the whole table.',
+                            ),
+                        },
+                    },
+                ],
+                [
+                    {
                         name: 'bordered',
                         config: {
                             type: 'CheckboxControl',

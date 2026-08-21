@@ -243,6 +243,7 @@ export default function PivotTableChart(props: PivotTableProps) {
     rowSubTotals,
     rowColumnFormats,
     metricColumnWidths,
+    columnColumnFormats,
     valueFormat,
     currencyFormat,
     currencyCodeColumn,
@@ -591,6 +592,7 @@ export default function PivotTableChart(props: PivotTableProps) {
       rowSubTotals,
       rowColumnFormats,
       metricColumnWidths,
+      columnColumnFormats,
       highlightHeaderCellsOnHover:
         emitCrossFilters ||
         isFeatureEnabled(FeatureFlag.DrillBy) ||
@@ -617,6 +619,7 @@ export default function PivotTableChart(props: PivotTableProps) {
       rowSubTotals,
       rowColumnFormats,
       metricColumnWidths,
+      columnColumnFormats,
       selectedFilters,
       theme.colorBgBase,
       theme.colorPrimaryBg,

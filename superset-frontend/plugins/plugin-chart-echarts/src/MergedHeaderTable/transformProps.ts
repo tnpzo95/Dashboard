@@ -17,6 +17,7 @@
  * under the License.
  */
 import { getColumnLabel, getTimeFormatter } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 import {
     HeaderNode,
     MergedHeaderTableChartProps,
@@ -29,6 +30,7 @@ import {
     collectFlatLeafColumns,
     collectPivotNodes,
     getFormColumnLabel,
+    getPivotColumns,
     parseHeaderTree,
     updateNodeChildren,
 } from './headerTreeUtils';
@@ -48,6 +50,14 @@ const formatPivotLabel = (value: unknown, labelFormat?: string): string => {
     return String(value);
 };
 
+// A blank pivot value (null/undefined/empty-or-whitespace string) would
+// otherwise render as an empty header cell -- skip generating a column (or
+// group, together with its whole subtree) for it entirely.
+const isBlankPivotValue = (value: unknown): boolean =>
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' && value.trim() === '');
+
 const sortPivotValues = (values: unknown[], descending?: boolean) => {
     const sorted = [...values].sort((a, b) => {
         if (typeof a === 'number' && typeof b === 'number') {
@@ -58,10 +68,118 @@ const sortPivotValues = (values: unknown[], descending?: boolean) => {
     return descending ? sorted.reverse() : sorted;
 };
 
+// Separator used to join a pivot value-path (one value per pivot level)
+// into a single lookup key. Distinct from buildRowKey's separator since
+// these key two unrelated maps.
+const PIVOT_PATH_SEPARATOR = '__/__';
+
+type PivotValueTree = Map<unknown, PivotValueTree>;
+
+// Groups a pivot query's rows into a tree of distinct value combinations,
+// one level per pivot column (e.g. month -> week -> date), so each level
+// can be sorted and rendered as its own nested group header.
+function buildPivotValueTree(
+    rows: MergedHeaderTableDatum[],
+    pivotColumnLabels: string[],
+): PivotValueTree {
+    const root: PivotValueTree = new Map();
+    rows.forEach(row => {
+        let cursor = root;
+        pivotColumnLabels.forEach(label => {
+            const val = row[label];
+            let next = cursor.get(val);
+            if (!next) {
+                next = new Map();
+                cursor.set(val, next);
+            }
+            cursor = next;
+        });
+    });
+    return root;
+}
+
+interface PivotLeafPath {
+    values: unknown[];
+    syntheticKey: string;
+}
+
+// A dynamically-inserted "Subtotal" column under one intermediate group
+// (e.g. one Week's Subtotal, or one Month's Subtotal), plus the synthetic
+// leaf-column keys it needs to sum per row.
+interface PivotSubtotalGroup {
+    syntheticKey: string;
+    leafKeys: string[];
+}
+
+// Recursively turns one level of the distinct-value tree into HeaderNodes:
+// intermediate levels become static group headers (children = next level,
+// plus a trailing "Subtotal" leaf when `node.pivot.colSubtotals` is on),
+// the deepest level becomes the actual leaf columns bound to synthetic keys.
+function buildPivotHeaderLevel(
+    tree: PivotValueTree,
+    level: number,
+    pivotColumnLabels: string[],
+    node: HeaderNode,
+    pivotIndex: number,
+    parentValues: unknown[],
+    leaves: PivotLeafPath[],
+    subtotalGroups: PivotSubtotalGroup[],
+): HeaderNode[] {
+    const isLeafLevel = level === pivotColumnLabels.length - 1;
+    const sortedValues = sortPivotValues(
+        Array.from(tree.keys()).filter(value => !isBlankPivotValue(value)),
+        node.pivot!.sortDescending,
+    );
+    return sortedValues.map(value => {
+        const values = [...parentValues, value];
+        if (isLeafLevel) {
+            const syntheticKey = `__pivot_${pivotIndex}_${leaves.length}`;
+            leaves.push({ values, syntheticKey });
+            return {
+                label: formatPivotLabel(value, node.pivot!.labelFormat),
+                column: syntheticKey,
+                numberFormat: node.numberFormat,
+                align: node.align,
+                width: node.width,
+            };
+        }
+        const leafStart = leaves.length;
+        const children = buildPivotHeaderLevel(
+            tree.get(value)!,
+            level + 1,
+            pivotColumnLabels,
+            node,
+            pivotIndex,
+            values,
+            leaves,
+            subtotalGroups,
+        );
+        if (node.pivot!.colSubtotals) {
+            const groupLeafKeys = leaves
+                .slice(leafStart)
+                .map(({ syntheticKey }) => syntheticKey);
+            const subtotalKey = `__pivot_${pivotIndex}_subtotal_${subtotalGroups.length}`;
+            subtotalGroups.push({ syntheticKey: subtotalKey, leafKeys: groupLeafKeys });
+            children.push({
+                label: t('Subtotal'),
+                column: subtotalKey,
+                numberFormat: node.numberFormat,
+                align: node.align,
+                width: node.width,
+                isSubtotalColumn: true,
+            });
+        }
+        return {
+            label: String(value),
+            children,
+        };
+    });
+}
+
 // Reshape one pivot query's "long format" rows — one row per (row header,
-// pivot value) — into a set of dynamically generated leaf columns plus the
-// wide-format values to merge into `data`, keyed by a synthetic column name
-// unique to this pivot node.
+// pivot value path) — into a (possibly nested) set of dynamically generated
+// header groups/leaf columns, plus the wide-format values merged into
+// `data`, keyed by a synthetic column name unique to each generated leaf.
 function resolvePivotNode(
     node: HeaderNode,
     pivotIndex: number,
@@ -69,45 +187,88 @@ function resolvePivotNode(
     data: MergedHeaderTableDatum[],
     rowHeaderColumns: string[],
 ): HeaderNode[] {
-    const pivotColumnLabel = getFormColumnLabel(node.pivot!.pivotColumn!);
+    const pivotColumnLabels = getPivotColumns(node.pivot).map(getFormColumnLabel);
     const valueColumnLabel = getFormColumnLabel(node.pivot!.valueColumn!);
+    if (pivotColumnLabels.length === 0) {
+        return [];
+    }
 
-    const valuesByRowKey = new Map<string, Map<unknown, unknown>>();
-    const distinctValues = new Set<unknown>();
+    const tree = buildPivotValueTree(pivotRows, pivotColumnLabels);
+    const leaves: PivotLeafPath[] = [];
+    const subtotalGroups: PivotSubtotalGroup[] = [];
+    const headerNodes = buildPivotHeaderLevel(
+        tree,
+        0,
+        pivotColumnLabels,
+        node,
+        pivotIndex,
+        [],
+        leaves,
+        subtotalGroups,
+    );
+
+    // The outermost level (e.g. Month) has no enclosing group to attach its
+    // own subtotal to -- buildPivotHeaderLevel only appends a group's
+    // subtotal from within its *parent's* recursive call, and the top level
+    // has none. Append the equivalent here: one "Total" column summing
+    // every leaf in the whole pivot.
+    if (node.pivot!.colGrandTotal) {
+        const grandTotalKey = `__pivot_${pivotIndex}_grandtotal`;
+        subtotalGroups.push({
+            syntheticKey: grandTotalKey,
+            leafKeys: leaves.map(({ syntheticKey }) => syntheticKey),
+        });
+        headerNodes.push({
+            label: t('Total'),
+            column: grandTotalKey,
+            numberFormat: node.numberFormat,
+            align: node.align,
+            width: node.width,
+            isSubtotalColumn: true,
+        });
+    }
+
+    const valuesByRowKey = new Map<string, Map<string, unknown>>();
     pivotRows.forEach(row => {
         const key = buildRowKey(row, rowHeaderColumns);
-        const pivotValue = row[pivotColumnLabel];
-        distinctValues.add(pivotValue);
+        const pathKey = pivotColumnLabels
+            .map(label => String(row[label]))
+            .join(PIVOT_PATH_SEPARATOR);
         const valueMap = valuesByRowKey.get(key) || new Map();
-        valueMap.set(pivotValue, row[valueColumnLabel]);
+        valueMap.set(pathKey, row[valueColumnLabel]);
         valuesByRowKey.set(key, valueMap);
     });
-
-    const sortedValues = sortPivotValues(
-        Array.from(distinctValues),
-        node.pivot!.sortDescending,
-    );
-    const syntheticKeys = sortedValues.map(
-        (_, valueIndex) => `__pivot_${pivotIndex}_${valueIndex}`,
-    );
 
     data.forEach(row => {
         const key = buildRowKey(row, rowHeaderColumns);
         const valueMap = valuesByRowKey.get(key);
-        sortedValues.forEach((pivotValue, valueIndex) => {
-            const value = valueMap?.get(pivotValue);
+        leaves.forEach(({ values, syntheticKey }) => {
+            const pathKey = values.map(v => String(v)).join(PIVOT_PATH_SEPARATOR);
+            const value = valueMap?.get(pathKey);
             // eslint-disable-next-line no-param-reassign
-            row[syntheticKeys[valueIndex]] = value === undefined ? null : (value as any);
+            row[syntheticKey] = value === undefined ? null : (value as any);
         });
     });
 
-    return sortedValues.map((pivotValue, valueIndex) => ({
-        label: formatPivotLabel(pivotValue, node.pivot!.labelFormat),
-        column: syntheticKeys[valueIndex],
-        numberFormat: node.numberFormat,
-        align: node.align,
-        width: node.width,
-    }));
+    // Subtotal columns sum their group's leaf columns per row -- computed
+    // after the leaf values above are merged in, since they read those.
+    subtotalGroups.forEach(({ syntheticKey, leafKeys }) => {
+        data.forEach(row => {
+            let sum = 0;
+            let hasNumber = false;
+            leafKeys.forEach(leafKey => {
+                const value = row[leafKey];
+                if (typeof value === 'number') {
+                    sum += value;
+                    hasNumber = true;
+                }
+            });
+            // eslint-disable-next-line no-param-reassign
+            row[syntheticKey] = hasNumber ? sum : null;
+        });
+    });
+
+    return headerNodes;
 }
 
 export default function transformProps(
@@ -122,6 +283,7 @@ export default function transformProps(
         cellFontSize,
         rowHeaderColumnFormats,
         showGrandTotal,
+        enableColumnSort,
     } = formData;
 
     const rowHeaderColumns = groupby.map(column => getColumnLabel(column));
@@ -135,7 +297,8 @@ export default function transformProps(
     let { columns: headerTree } = parsedTree;
 
     const pivotNodes = collectPivotNodes(headerTree).filter(
-        ({ node }) => node.pivot?.pivotColumn && node.pivot?.valueColumn,
+        ({ node }) =>
+            getPivotColumns(node.pivot).length > 0 && node.pivot?.valueColumn,
     );
 
     pivotNodes.forEach(({ path, node }, pivotIndex) => {
@@ -170,6 +333,7 @@ export default function transformProps(
         mergeRowHeaders,
         bordered,
         cellFontSize,
+        enableColumnSort,
         error,
     };
 }

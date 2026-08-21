@@ -31,6 +31,7 @@ import {
 } from '@superset-ui/chart-controls';
 import {
     HeaderNode,
+    HeaderPivotConfig,
     HeaderTreeConfig,
     MergedHeaderTableDatum,
     RowHeaderColumnFormats,
@@ -38,6 +39,21 @@ import {
 
 export const getFormColumnLabel = (column: QueryFormColumn): string =>
     getColumnLabel(column);
+
+// Resolves a pivot config's ordered list of pivot-by columns, falling back
+// to the deprecated single `pivotColumn` field for header trees saved
+// before multi-level pivot was added.
+export function getPivotColumns(
+    pivot: HeaderPivotConfig | undefined,
+): QueryFormColumn[] {
+    if (!pivot) {
+        return [];
+    }
+    if (pivot.pivotColumns && pivot.pivotColumns.length > 0) {
+        return pivot.pivotColumns;
+    }
+    return pivot.pivotColumn ? [pivot.pivotColumn] : [];
+}
 
 // D3 time-format specifiers always start with `%` (e.g. "%Y-%m-%d %H:%M:%S"),
 // while D3 number-format specifiers never do -- since a single numberFormat

@@ -44,7 +44,11 @@ import {
 } from '@superset-ui/chart-controls';
 import { PivotData, flatKey } from './utilities';
 import { Styles } from './Styles';
-import { MetricColumnWidths, RowColumnFormats } from '../types';
+import {
+  ColumnColumnFormats,
+  MetricColumnWidths,
+  RowColumnFormats,
+} from '../types';
 
 type ClickCallback = (
   e: MouseEvent,
@@ -82,6 +86,7 @@ interface TableOptions {
   hiddenRowAttrs?: string[];
   rowColumnFormats?: RowColumnFormats;
   metricColumnWidths?: MetricColumnWidths;
+  columnColumnFormats?: ColumnColumnFormats;
 }
 
 interface SubtotalDisplay {
@@ -387,6 +392,37 @@ export function TableRenderer(props: TableRendererProps) {
       return width ? { width, minWidth: width, maxWidth: width } : {};
     },
     [tableOptions.metricColumnWidths],
+  );
+
+  // Style for a Columns-header cell at a given attribute level, applying
+  // that attribute's configured fixed leaf-column width if set. Also used
+  // (at the deepest Columns attribute) to size the data/total cells so
+  // they line up with their leaf header column.
+  const getColAttrStyle = useCallback(
+    (attrIdx: number): CSSProperties => {
+      const attrName = cols[attrIdx];
+      const format = attrName
+        ? tableOptions.columnColumnFormats?.[attrName]
+        : undefined;
+      const style: CSSProperties = {};
+      if (format?.width) {
+        style.width = format.width;
+        style.minWidth = format.width;
+        style.maxWidth = format.width;
+      }
+      if (format?.align) {
+        style.textAlign = format.align;
+      }
+      return style;
+    },
+    [cols, tableOptions.columnColumnFormats],
+  );
+
+  // Data/total cells correspond 1:1 to the deepest (leaf) Columns
+  // attribute, so they take their width from that attribute's format.
+  const leafColAttrStyle = useMemo(
+    () => getColAttrStyle(cols.length - 1),
+    [getColAttrStyle, cols.length],
   );
 
   // Style (+ pinned flag) for a Rows column cell, shared by every place a
@@ -1153,10 +1189,12 @@ export function TableRenderer(props: TableRendererProps) {
             attrIdx === metricDimIndex && colSpan === 1
               ? getMetricColStyle(colKey[attrIdx])
               : {};
+          const colAttrStyle = colSpan === 1 ? getColAttrStyle(attrIdx) : {};
           const colHeaderStyle = {
             backgroundColor,
             ...(color ? { color } : {}),
             ...metricColStyle,
+            ...colAttrStyle,
           };
           attrValueCells.push(
             <th
@@ -1208,6 +1246,7 @@ export function TableRenderer(props: TableRendererProps) {
               key={`colKeyBuffer-${flatKey(colKey)}`}
               colSpan={colSpan}
               rowSpan={rowSpan}
+              style={leafColAttrStyle}
               onClick={clickHeaderHandler(
                 pivotData,
                 colKey,
@@ -1279,6 +1318,8 @@ export function TableRenderer(props: TableRendererProps) {
       getRowColStyling,
       metricDimIndex,
       getMetricColStyle,
+      getColAttrStyle,
+      leafColAttrStyle,
     ],
   );
 
@@ -1560,11 +1601,13 @@ export function TableRenderer(props: TableRendererProps) {
               backgroundColor,
               fontWeight: 'bold',
               color: color ?? cellTextColor,
+              ...leafColAttrStyle,
               ...metricColStyle,
             }
           : {
               backgroundColor,
               color: color ?? cellTextColor,
+              ...leafColAttrStyle,
               ...metricColStyle,
             };
 
@@ -1626,6 +1669,7 @@ export function TableRenderer(props: TableRendererProps) {
       getRowColStyling,
       metricDimIndex,
       getMetricColStyle,
+      leafColAttrStyle,
     ],
   );
 
@@ -1701,7 +1745,11 @@ export function TableRenderer(props: TableRendererProps) {
             key={`total-${flatColKey}`}
             onClick={colTotalCallbacks[flatColKey]}
             onContextMenu={e => onContextMenu(e, colKey, undefined)}
-            style={{ padding: '5px', ...getMetricColStyle(metricName) }}
+            style={{
+              padding: '5px',
+              ...leafColAttrStyle,
+              ...getMetricColStyle(metricName),
+            }}
           >
             {displayCell(agg.format(aggValue, agg), allowRenderHtml)}
           </td>
@@ -1747,6 +1795,7 @@ export function TableRenderer(props: TableRendererProps) {
       allowRenderHtml,
       metricDimIndex,
       getMetricColStyle,
+      leafColAttrStyle,
     ],
   );
 

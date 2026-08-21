@@ -34,6 +34,7 @@ import { HeaderNode } from './types';
 import {
     collectLeaves,
     getFormatOptionsForColumn,
+    getPivotColumns,
     parseHeaderTree,
     updateLeafColumn,
     updateLeafPivot,
@@ -262,10 +263,21 @@ export default function HeaderStructureControl({
 
     const handlePivotColumnChange = (
         path: number[],
-        field: 'pivotColumn' | 'valueColumn',
+        field: 'valueColumn',
         column: QueryFormColumn | undefined,
     ) => {
         const newTree = updateLeafPivot(tree, path, { [field]: column });
+        onChange?.(JSON.stringify({ columns: newTree }, null, 2));
+    };
+
+    const handlePivotColumnsChange = (
+        path: number[],
+        columns: QueryFormColumn[] | undefined,
+    ) => {
+        const newTree = updateLeafPivot(tree, path, {
+            pivotColumn: undefined,
+            pivotColumns: columns,
+        });
         onChange?.(JSON.stringify({ columns: newTree }, null, 2));
     };
 
@@ -395,22 +407,25 @@ export default function HeaderStructureControl({
                                 <PivotFieldsWrapper>
                                     <PivotSelectSlot>
                                         <Select
-                                            ariaLabel={t('Pivot by column')}
+                                            ariaLabel={t('Pivot by columns')}
+                                            mode="multiple"
                                             options={columnOptions}
-                                            value={
-                                                typeof leaf.node.pivot?.pivotColumn ===
-                                                'string'
-                                                    ? leaf.node.pivot.pivotColumn
-                                                    : undefined
-                                            }
+                                            value={getPivotColumns(
+                                                leaf.node.pivot,
+                                            ).filter(
+                                                (col): col is string =>
+                                                    typeof col === 'string',
+                                            )}
                                             onChange={selected =>
-                                                handlePivotColumnChange(
+                                                handlePivotColumnsChange(
                                                     leaf.path,
-                                                    'pivotColumn',
-                                                    (selected as string) || undefined,
+                                                    (selected as string[]) || undefined,
                                                 )
                                             }
-                                            placeholder={t('Pivot by (e.g. date)')}
+                                            placeholder={t(
+                                                'Pivot by (order = group level, ' +
+                                                'e.g. Month, Week, Date)',
+                                            )}
                                             allowClear
                                         />
                                     </PivotSelectSlot>

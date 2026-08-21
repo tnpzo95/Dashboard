@@ -22,6 +22,7 @@ import {
     collectPivotNodes,
     dedupeColumns,
     flattenLeafColumns,
+    getPivotColumns,
     parseHeaderTree,
 } from './headerTreeUtils';
 
@@ -37,7 +38,8 @@ export default function buildQuery(formData: MergedHeaderTableFormData) {
     const { columns: headerTree } = parseHeaderTree(headerTreeJson);
     const leafColumns = flattenLeafColumns(headerTree);
     const pivotNodes = collectPivotNodes(headerTree).filter(
-        ({ node }) => node.pivot?.pivotColumn && node.pivot?.valueColumn,
+        ({ node }) =>
+            getPivotColumns(node.pivot).length > 0 && node.pivot?.valueColumn,
     );
 
     // Raw records query: every value is the column's own value on that row,
@@ -60,9 +62,10 @@ export default function buildQuery(formData: MergedHeaderTableFormData) {
         // this into wide format (one auto-generated column per distinct
         // pivot value) and merges it into the base query's rows.
         ...pivotNodes.map(({ node }) => {
+            const nodePivotColumns = getPivotColumns(node.pivot);
             const pivotColumns = dedupeColumns([
                 ...groupby,
-                node.pivot!.pivotColumn!,
+                ...nodePivotColumns,
                 node.pivot!.valueColumn!,
             ]);
             return {
@@ -70,7 +73,7 @@ export default function buildQuery(formData: MergedHeaderTableFormData) {
                 metrics: [],
                 columns: pivotColumns,
                 groupby: [],
-                orderby: [...groupby, node.pivot!.pivotColumn!].map(column => [
+                orderby: [...groupby, ...nodePivotColumns].map(column => [
                     column,
                     true,
                 ]),

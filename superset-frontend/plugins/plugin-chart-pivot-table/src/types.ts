@@ -52,6 +52,16 @@ export interface RowColumnFormat {
 export type RowColumnFormats = Record<string, RowColumnFormat>;
 export type MetricColumnWidths = Record<string, number>;
 
+export interface ColumnColumnFormat {
+  // Fixed width (px) for the leaf-level data/header cells under this
+  // Columns attribute (e.g. the individual date columns of a date
+  // grouping), applied at whichever level is the deepest visible one.
+  width?: number;
+  // Text alignment for this Columns attribute's header cell.
+  align?: 'left' | 'center' | 'right';
+}
+export type ColumnColumnFormats = Record<string, ColumnColumnFormat>;
+
 export type DateFormatter =
   | TimeFormatter
   | NumberFormatter
@@ -80,6 +90,7 @@ interface PivotTableCustomizeProps {
   rowSubTotals: boolean;
   rowColumnFormats?: RowColumnFormats;
   metricColumnWidths?: MetricColumnWidths;
+  columnColumnFormats?: ColumnColumnFormats;
   valueFormat: string;
   currencyFormat: Currency;
   currencyCodeColumn?: string;

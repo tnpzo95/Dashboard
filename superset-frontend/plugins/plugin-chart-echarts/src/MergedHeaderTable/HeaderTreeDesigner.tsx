@@ -25,6 +25,7 @@ import { Icons } from '@superset-ui/core/components/Icons';
 import { HeaderNode } from './types';
 import {
     getFormatOptionsForColumn,
+    getPivotColumns,
     insertNode,
     moveNode,
     removeNode,
@@ -488,25 +489,30 @@ function NodeEditor({
             {type === 'pivot' && (
                 <FieldsStack>
                     <Field>
-                        <FieldLabel>{t('Pivot by (e.g. date)')}</FieldLabel>
+                        <FieldLabel>
+                            {t(
+                                'Pivot by (order = group level, outermost first, ' +
+                                'e.g. Month, Week, Date)',
+                            )}
+                        </FieldLabel>
                         <Select
-                            ariaLabel={t('Pivot by column')}
+                            ariaLabel={t('Pivot by columns')}
+                            mode="multiple"
                             options={columnOptions}
-                            value={
-                                typeof node.pivot?.pivotColumn === 'string'
-                                    ? node.pivot.pivotColumn
-                                    : undefined
-                            }
+                            value={getPivotColumns(node.pivot).filter(
+                                (col): col is string => typeof col === 'string',
+                            )}
                             onChange={value =>
                                 onUpdate(path, {
                                     pivot: {
                                         ...node.pivot,
-                                        pivotColumn:
-                                            (value as QueryFormColumn) || undefined,
+                                        pivotColumn: undefined,
+                                        pivotColumns:
+                                            (value as QueryFormColumn[]) || undefined,
                                     },
                                 })
                             }
-                            placeholder={t('Pivot by column')}
+                            placeholder={t('Pivot by column(s)')}
                             allowClear
                         />
                     </Field>
@@ -558,6 +564,28 @@ function NodeEditor({
                             }
                         />
                         {t('Sort descending')}
+                    </InlineSwitchField>
+                    <InlineSwitchField>
+                        <Switch
+                            checked={Boolean(node.pivot?.colSubtotals)}
+                            onChange={checked =>
+                                onUpdate(path, {
+                                    pivot: { ...node.pivot, colSubtotals: checked },
+                                })
+                            }
+                        />
+                        {t('Show column subtotal per group (multi-level pivot)')}
+                    </InlineSwitchField>
+                    <InlineSwitchField>
+                        <Switch
+                            checked={Boolean(node.pivot?.colGrandTotal)}
+                            onChange={checked =>
+                                onUpdate(path, {
+                                    pivot: { ...node.pivot, colGrandTotal: checked },
+                                })
+                            }
+                        />
+                        {t('Show grand total column (sums the whole pivot)')}
                     </InlineSwitchField>
                     {(() => {
                         const { options, docs } = getFormatOptionsForColumn(
