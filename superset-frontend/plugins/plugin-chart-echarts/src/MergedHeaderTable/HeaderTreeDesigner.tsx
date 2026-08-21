@@ -73,6 +73,11 @@ const ALIGN_OPTIONS = [
     { label: t('Right'), value: 'right' },
 ];
 
+const GRAND_TOTAL_COLUMN_POSITION_OPTIONS = [
+    { label: t('End (default)'), value: 'end' },
+    { label: t('Start'), value: 'start' },
+];
+
 const TYPE_OPTIONS = [
     { label: t('Leaf column'), value: 'leaf' },
     { label: t('Group'), value: 'group' },
@@ -587,6 +592,25 @@ function NodeEditor({
                         />
                         {t('Show grand total column (sums the whole pivot)')}
                     </InlineSwitchField>
+                    {Boolean(node.pivot?.colGrandTotal) && (
+                        <Field>
+                            <FieldLabel>{t('Grand total column position')}</FieldLabel>
+                            <Select
+                                ariaLabel={t('Grand total column position')}
+                                options={GRAND_TOTAL_COLUMN_POSITION_OPTIONS}
+                                value={node.pivot?.colGrandTotalPosition || 'end'}
+                                onChange={value =>
+                                    onUpdate(path, {
+                                        pivot: {
+                                            ...node.pivot,
+                                            colGrandTotalPosition:
+                                                (value as 'start' | 'end') || undefined,
+                                        },
+                                    })
+                                }
+                            />
+                        </Field>
+                    )}
                     {(() => {
                         const { options, docs } = getFormatOptionsForColumn(
                             typeof node.pivot?.valueColumn === 'string'

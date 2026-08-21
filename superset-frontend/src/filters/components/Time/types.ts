@@ -37,6 +37,7 @@ interface PluginFilterTimeCustomizeProps {
   defaultFillterShiftDaysAgoNumber?: number | null;
   enableMaxDaysRange?: boolean | null;
   maxDaysRange?: number | null;
+  enableHourFilter?: boolean | null;
   width?: number | null;
 }
 
@@ -65,5 +66,6 @@ export const DEFAULT_FORM_DATA: PluginFilterTimeCustomizeProps = {
   defaultFillterShiftDaysAgoNumber: 3,
   enableMaxDaysRange: false,
   maxDaysRange: 3,
+  enableHourFilter: true,
   width: 0,
 };

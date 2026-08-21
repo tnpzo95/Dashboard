@@ -30,6 +30,7 @@ import { FilterPluginStyle } from '../common';
 // (open-ended). Matches the backend separator in utils/date_parser.py.
 const SEPARATOR = ' : ';
 const DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+const DATE_ONLY_FORMAT = 'YYYY-MM-DD';
 
 const TimeFilterStyles = styled(FilterPluginStyle)`
   display: flex;
@@ -141,9 +142,12 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
     defaultFillterShiftDaysAgoNumber,
     enableMaxDaysRange,
     maxDaysRange,
+    enableHourFilter,
     width: customWidth,
   } = formData;
   const effectiveWidth = customWidth && customWidth > 0 ? customWidth : width;
+  const showTime = enableHourFilter !== false;
+  const displayFormat = showTime ? DISPLAY_FORMAT : DATE_ONLY_FORMAT;
 
   const [since, until] = timeRangeToValues(
     filterState.value as string | undefined,
@@ -168,9 +172,15 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
 
   const handleChange = useCallback(
     (nextSince: Dayjs | null, nextUntil: Dayjs | null) => {
-      handleTimeRangeChange(valuesToTimeRange(nextSince, nextUntil));
+      const normalizedSince =
+        nextSince && !showTime ? nextSince.startOf('day') : nextSince;
+      const normalizedUntil =
+        nextUntil && !showTime ? nextUntil.endOf('day') : nextUntil;
+      handleTimeRangeChange(
+        valuesToTimeRange(normalizedSince, normalizedUntil),
+      );
     },
-    [handleTimeRangeChange],
+    [handleTimeRangeChange, showTime],
   );
 
   // Disable dates outside the allowed range on the End picker
@@ -316,8 +326,8 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
         tabIndex={-1}
       >
         <StyledDatePicker
-          showTime
-          format={DISPLAY_FORMAT}
+          showTime={showTime}
+          format={displayFormat}
           value={since ?? undefined}
           placeholder={t('Start date/time')}
           disabledDate={disabledStartDate}
@@ -335,8 +345,8 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
         />
         <RangeSeparator>~</RangeSeparator>
         <StyledDatePicker
-          showTime
-          format={DISPLAY_FORMAT}
+          showTime={showTime}
+          format={displayFormat}
           value={until ?? undefined}
           placeholder={t('End date/time')}
           disabledDate={disabledEndDate}

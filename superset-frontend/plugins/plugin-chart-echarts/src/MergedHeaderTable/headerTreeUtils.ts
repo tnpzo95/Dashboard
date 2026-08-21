@@ -257,6 +257,7 @@ export function augmentDataWithSubtotals(
     columnFormats: RowHeaderColumnFormats,
     leafColumns: FlatLeafColumn[],
     showGrandTotal?: boolean,
+    grandTotalRowPosition: 'top' | 'bottom' = 'bottom',
 ): MergedHeaderTableDatum[] {
     if (data.length === 0) {
         return showGrandTotal
@@ -299,7 +300,12 @@ export function augmentDataWithSubtotals(
         }
     });
     if (showGrandTotal) {
-        result.push(buildTotalRow(data, rowHeaderColumns, leafColumns));
+        const totalRow = buildTotalRow(data, rowHeaderColumns, leafColumns);
+        if (grandTotalRowPosition === 'top') {
+            result.unshift(totalRow);
+        } else {
+            result.push(totalRow);
+        }
     }
     return result;
 }

@@ -162,6 +162,28 @@ export default {
                 ],
                 [
                     {
+                        name: 'grandTotalRowPosition',
+                        config: {
+                            type: 'SelectControl',
+                            label: t('Total Row Position'),
+                            renderTrigger: true,
+                            clearable: false,
+                            default: 'bottom',
+                            options: [
+                                { label: t('Bottom (default)'), value: 'bottom' },
+                                { label: t('Top'), value: 'top' },
+                            ],
+                            description: t(
+                                'Where the Total Row appears when "Show Total ' +
+                                'Row" is enabled.',
+                            ),
+                            visibility: ({ controls }: { controls: any }) =>
+                                Boolean(controls?.showGrandTotal?.value),
+                        },
+                    },
+                ],
+                [
+                    {
                         name: 'enableColumnSort',
                         config: {
                             type: 'CheckboxControl',

@@ -55,6 +55,11 @@ export interface HeaderPivotConfig {
     // subtotal to, so this is its equivalent, mirroring the standard
     // PivotTable chart's "Show columns total".
     colGrandTotal?: boolean;
+    // Where the grand-total column appears relative to the pivot's
+    // top-level groups. 'end' (default) appends it after the last group,
+    // matching PivotTable's "Show columns total"; 'start' inserts it before
+    // the first group instead.
+    colGrandTotalPosition?: 'start' | 'end';
 }
 
 // A node in the manually-declared header tree.
@@ -118,6 +123,10 @@ export type MergedHeaderTableFormData = QueryFormData & {
     numberFormat?: string;
     rowHeaderColumnFormats?: RowHeaderColumnFormats;
     showGrandTotal?: boolean;
+    // Where the grand-total row appears. 'bottom' (default) adds it after
+    // every data/subtotal row; 'top' inserts it before the first row
+    // instead, while still summing every row's original data.
+    grandTotalRowPosition?: 'top' | 'bottom';
     enableColumnSort?: boolean;
 };
 

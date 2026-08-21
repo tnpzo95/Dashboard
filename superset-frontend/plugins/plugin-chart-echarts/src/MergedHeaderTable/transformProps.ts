@@ -218,14 +218,19 @@ function resolvePivotNode(
             syntheticKey: grandTotalKey,
             leafKeys: leaves.map(({ syntheticKey }) => syntheticKey),
         });
-        headerNodes.push({
+        const grandTotalNode: HeaderNode = {
             label: t('Total'),
             column: grandTotalKey,
             numberFormat: node.numberFormat,
             align: node.align,
             width: node.width,
             isSubtotalColumn: true,
-        });
+        };
+        if (node.pivot!.colGrandTotalPosition === 'start') {
+            headerNodes.unshift(grandTotalNode);
+        } else {
+            headerNodes.push(grandTotalNode);
+        }
     }
 
     const valuesByRowKey = new Map<string, Map<string, unknown>>();
@@ -283,6 +288,7 @@ export default function transformProps(
         cellFontSize,
         rowHeaderColumnFormats,
         showGrandTotal,
+        grandTotalRowPosition,
         enableColumnSort,
     } = formData;
 
@@ -321,6 +327,7 @@ export default function transformProps(
         rowHeaderColumnFormats || {},
         leafColumns,
         showGrandTotal,
+        grandTotalRowPosition,
     );
 
     return {

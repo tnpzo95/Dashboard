@@ -61,6 +61,23 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'enableHourFilter',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Filter by hour'),
+              default: true,
+              renderTrigger: true,
+              description: t(
+                'When checked, the filter lets the user pick a time of day ' +
+                'in addition to the date, for both the start and end. When ' +
+                'unchecked, only dates can be picked and the time is fixed ' +
+                'at 00:00:00 for the start and 23:59:59 for the end.',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'defaultFillterTimeNow',
             config: {
               type: 'CheckboxControl',
