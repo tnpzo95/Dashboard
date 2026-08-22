@@ -290,6 +290,7 @@ export default function transformProps(
         showGrandTotal,
         grandTotalRowPosition,
         enableColumnSort,
+        rowHighlightRules,
     } = formData;
 
     const rowHeaderColumns = groupby.map(column => getColumnLabel(column));
@@ -341,6 +342,7 @@ export default function transformProps(
         bordered,
         cellFontSize,
         enableColumnSort,
+        rowHighlightRules,
         error,
     };
 }

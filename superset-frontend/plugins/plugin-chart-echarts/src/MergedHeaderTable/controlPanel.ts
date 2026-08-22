@@ -25,6 +25,7 @@ import {
 } from './constants';
 import HeaderStructureControl from './HeaderStructureControl';
 import RowHeaderColumnFormatControl from './RowHeaderColumnFormatControl';
+import RowHighlightRulesControl from './RowHighlightRulesControl';
 
 export default {
     controlPanelSections: [
@@ -225,6 +226,34 @@ export default {
                             default: DEFAULT_CELL_FONT_SIZE,
                             options: CELL_FONT_SIZE_OPTIONS,
                             description: t('Font size of table cells'),
+                        },
+                    },
+                ],
+                [
+                    {
+                        name: 'rowHighlightRules',
+                        config: {
+                            type: RowHighlightRulesControl,
+                            label: t('Row Highlight Rules'),
+                            renderTrigger: true,
+                            default: [],
+                            description: t(
+                                'Paint an entire row with a custom background/text ' +
+                                'color whenever a chosen Row Header Column equals a ' +
+                                'given value (e.g. ROW_TYPE = "Rate Bin 2"). The ' +
+                                'first matching rule wins.',
+                            ),
+                            mapStateToProps: ({
+                                controls,
+                                datasource,
+                            }: {
+                                controls: any;
+                                datasource: any;
+                            }) => ({
+                                groupby: controls?.groupby?.value || [],
+                                datasourceColumns: datasource?.columns || [],
+                            }),
+                            rerender: ['groupby'],
                         },
                     },
                 ],

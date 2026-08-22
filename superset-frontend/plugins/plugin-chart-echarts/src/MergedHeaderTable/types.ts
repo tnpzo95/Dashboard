@@ -118,6 +118,24 @@ export interface RowHeaderColumnFormat {
 
 export type RowHeaderColumnFormats = Record<string, RowHeaderColumnFormat>;
 
+// One conditional-formatting rule: when `column`'s value on a row equals
+// `value` (exact match), every cell in that row (row headers + data
+// columns) is painted with `backgroundColor`/`textColor`. The first
+// matching rule in the list wins.
+export interface RowHighlightRule {
+    column?: string;
+    value?: string;
+    // D3 number/time format string, picked from the format list matching
+    // `column`'s data type (number formats for numeric columns, time
+    // formats for temporal ones) -- shown next to the "Value equals" input
+    // so the entered value is easy to read/verify against the table, and
+    // also overrides that row's own number/date format when applied to the
+    // table (see highlightAwareFormatter in MergedHeaderTableViz).
+    format?: string;
+    backgroundColor?: string;
+    textColor?: string;
+}
+
 export type MergedHeaderTableFormData = QueryFormData & {
     groupby?: QueryFormColumn[];
     headerTreeJson?: string;
@@ -133,6 +151,7 @@ export type MergedHeaderTableFormData = QueryFormData & {
     // instead, while still summing every row's original data.
     grandTotalRowPosition?: 'top' | 'bottom';
     enableColumnSort?: boolean;
+    rowHighlightRules?: RowHighlightRule[];
 };
 
 export interface MergedHeaderTableDatum {
@@ -161,5 +180,6 @@ export interface MergedHeaderTableVizProps {
     bordered?: boolean;
     cellFontSize?: number;
     enableColumnSort?: boolean;
+    rowHighlightRules?: RowHighlightRule[];
     error?: string;
 }

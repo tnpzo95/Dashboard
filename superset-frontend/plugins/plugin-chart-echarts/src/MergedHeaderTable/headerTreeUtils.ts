@@ -35,6 +35,7 @@ import {
     HeaderTreeConfig,
     MergedHeaderTableDatum,
     RowHeaderColumnFormats,
+    RowHighlightRule,
 } from './types';
 
 export const getFormColumnLabel = (column: QueryFormColumn): string =>
@@ -126,6 +127,20 @@ export function renderFormattedValue(
             return formatter(value);
         } catch {
             return String(value);
+        }
+    }
+    // Some sources (e.g. Oracle NUMBER columns via the driver, or a
+    // computed rate) come back as a numeric-looking string rather than a
+    // JS number -- still worth running through the formatter instead of
+    // showing the raw unformatted string.
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed !== '' && Number.isFinite(Number(trimmed))) {
+            try {
+                return formatter(Number(trimmed));
+            } catch {
+                return value;
+            }
         }
     }
     return String(value);
@@ -308,6 +323,24 @@ export function augmentDataWithSubtotals(
         }
     }
     return result;
+}
+
+// Returns the first rule whose `column` value on this row exactly equals
+// `value` (as a string), or undefined if none match / no rules configured.
+export function matchRowHighlightRule(
+    row: MergedHeaderTableDatum,
+    rules: RowHighlightRule[] | undefined,
+): RowHighlightRule | undefined {
+    if (!rules || rules.length === 0) {
+        return undefined;
+    }
+    return rules.find(
+        rule =>
+            rule.column &&
+            rule.value !== undefined &&
+            rule.value !== '' &&
+            String(row[rule.column] ?? '') === rule.value,
+    );
 }
 
 export function parseHeaderTree(json?: string): {

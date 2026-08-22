@@ -23,6 +23,7 @@ import {
     computeRowSpans,
     getFormColumnLabel,
     getSmartFormatter,
+    matchRowHighlightRule,
     renderFormattedValue,
     ROW_TYPE_KEY,
 } from './headerTreeUtils';
@@ -31,6 +32,7 @@ import {
     MergedHeaderTableDatum,
     MergedHeaderTableVizProps,
     RowHeaderColumnFormats,
+    RowHighlightRule,
 } from './types';
 
 // Background for the grand-Total row (not the per-group Subtotal). The
@@ -151,10 +153,37 @@ function makeGroupSorter(
     };
 }
 
+// Style to apply to every cell of a row matched by a Row Highlight Rule --
+// undefined when no rule matched, so it doesn't override the subtotal/total
+// row/column backgrounds (which use !important and take precedence anyway).
+function highlightCellStyle(
+    record: MergedHeaderTableDatum,
+    rules: RowHighlightRule[] | undefined,
+): { backgroundColor?: string; color?: string } | undefined {
+    const rule = matchRowHighlightRule(record, rules);
+    if (!rule) {
+        return undefined;
+    }
+    return { backgroundColor: rule.backgroundColor, color: rule.textColor };
+}
+
+// A matched Row Highlight Rule's own "Format" overrides the column's normal
+// number/date format for that row -- e.g. showing ".0%" for a rate row even
+// though the column itself uses a plain number format for every other row.
+function highlightAwareFormatter(
+    record: MergedHeaderTableDatum,
+    rules: RowHighlightRule[] | undefined,
+    defaultFormatter: (n: number) => string,
+): (n: number) => string {
+    const rule = matchRowHighlightRule(record, rules);
+    return rule?.format ? getSmartFormatter(rule.format) : defaultFormatter;
+}
+
 function buildColumns(
     nodes: HeaderNode[],
     parentPath: string,
     sortGroupColumns?: string[],
+    rowHighlightRules?: RowHighlightRule[],
 ): ColumnsType<MergedHeaderTableDatum> {
     return nodes.map((node, index) => {
         const path = `${parentPath}-${index}`;
@@ -163,7 +192,12 @@ function buildColumns(
                 title: node.label,
                 key: path,
                 align: node.align || 'center',
-                children: buildColumns(node.children, path, sortGroupColumns),
+                children: buildColumns(
+                    node.children,
+                    path,
+                    sortGroupColumns,
+                    rowHighlightRules,
+                ),
             };
         }
         const dataIndex = node.column ? getFormColumnLabel(node.column) : path;
@@ -182,7 +216,14 @@ function buildColumns(
             sorter: sortGroupColumns
                 ? makeGroupSorter(dataIndex, sortGroupColumns)
                 : undefined,
-            render: (value: unknown) => renderFormattedValue(value, formatter),
+            onCell: (record: MergedHeaderTableDatum) => ({
+                style: highlightCellStyle(record, rowHighlightRules),
+            }),
+            render: (value: unknown, record: MergedHeaderTableDatum) =>
+                renderFormattedValue(
+                    value,
+                    highlightAwareFormatter(record, rowHighlightRules, formatter),
+                ),
         };
     });
 }
@@ -197,6 +238,7 @@ function buildRowHeaderColumns(
     mergeRowHeaders: boolean,
     data: MergedHeaderTableDatum[],
     columnFormats: RowHeaderColumnFormats,
+    rowHighlightRules?: RowHighlightRule[],
 ): ColumnsType<MergedHeaderTableDatum> {
     const spans = computeRowSpans(data, rowHeaderColumns);
     return rowHeaderColumns.map((key, col) => {
@@ -214,12 +256,15 @@ function buildRowHeaderColumns(
             width:
                 columnFormats[key]?.width ??
                 (pinned ? DEFAULT_ROW_HEADER_WIDTH : undefined),
-            render: (value: unknown) => renderFormattedValue(value, formatter),
-            onCell: effectiveMerge
-                ? (_record: MergedHeaderTableDatum, rowIndex?: number) => ({
-                      rowSpan: spans[col][rowIndex ?? 0],
-                  })
-                : undefined,
+            render: (value: unknown, record: MergedHeaderTableDatum) =>
+                renderFormattedValue(
+                    value,
+                    highlightAwareFormatter(record, rowHighlightRules, formatter),
+                ),
+            onCell: (record: MergedHeaderTableDatum, rowIndex?: number) => ({
+                rowSpan: effectiveMerge ? spans[col][rowIndex ?? 0] : undefined,
+                style: highlightCellStyle(record, rowHighlightRules),
+            }),
         };
     });
 }
@@ -235,6 +280,7 @@ function MergedHeaderTableViz({
     bordered,
     cellFontSize,
     enableColumnSort,
+    rowHighlightRules,
     error,
 }: MergedHeaderTableVizProps) {
     if (error) {
@@ -269,8 +315,9 @@ function MergedHeaderTableViz({
             Boolean(mergeRowHeaders),
             data,
             rowHeaderColumnFormats || {},
+            rowHighlightRules,
         ),
-        ...buildColumns(headerTree, 'col', sortGroupColumns),
+        ...buildColumns(headerTree, 'col', sortGroupColumns, rowHighlightRules),
     ];
 
     return (
