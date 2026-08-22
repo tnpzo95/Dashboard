@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled, css } from '@apache-superset/core/theme';
+import { styled, css, isThemeDark } from '@apache-superset/core/theme';
 import { t } from '@apache-superset/core/translation';
 import { Table, ColumnsType, TableSize } from '@superset-ui/core/components';
 import {
@@ -33,12 +33,23 @@ import {
     RowHeaderColumnFormats,
 } from './types';
 
+// Background for the grand-Total row (not the per-group Subtotal). The
+// light-theme blue reads well with dark text on a white surface, but is too
+// pale to stand out against a dark surface with light text -- swap to a
+// deeper blue in dark mode so it stays clearly visible either way.
+const TOTAL_BG_COLOR_LIGHT = 'rgb(158, 199, 244)';
+const TOTAL_BG_COLOR_DARK = 'rgb(30, 64, 110)';
+
 const Wrapper = styled.div<{
     height: number;
     width: number;
     fontSize?: number;
 }>`
-    ${({ theme, height, width, fontSize }) => css`
+    ${({ theme, height, width, fontSize }) => {
+        const totalBgColor = isThemeDark(theme)
+            ? TOTAL_BG_COLOR_DARK
+            : TOTAL_BG_COLOR_LIGHT;
+        return css`
         height: ${height}px;
         width: ${width}px;
         overflow: auto;
@@ -82,21 +93,25 @@ const Wrapper = styled.div<{
                 ${theme.colorFillTertiary}
             ) !important;
         }
+        /* Grand-total row: fixed light-blue background, normal (unrecolored)
+           text, kept opaque (not the translucent gradient trick above) so
+           pinned columns don't show scrolled content bleeding through. */
         .ant-table-tbody > tr.mht-total-row > td {
             font-weight: ${theme.fontWeightStrong};
-            background-color: ${theme.colorBgContainer} !important;
-            background-image: linear-gradient(
-                ${theme.colorFillSecondary},
-                ${theme.colorFillSecondary}
-            ) !important;
+            background-color: ${totalBgColor} !important;
+            background-image: none !important;
         }
-        /* Auto-inserted "Subtotal" column of a multi-level pivot -- bold it
-           so it stands out from the regular leaf columns next to it. */
+        /* Auto-inserted "Subtotal" column of a multi-level pivot, and the
+           grand-"Total" column -- bold them so they stand out from the
+           regular leaf columns next to them (no background highlight). */
         .ant-table-tbody > tr > td.mht-subtotal-col,
-        .ant-table-thead > tr > th.mht-subtotal-col {
+        .ant-table-thead > tr > th.mht-subtotal-col,
+        .ant-table-tbody > tr > td.mht-total-col,
+        .ant-table-thead > tr > th.mht-total-col {
             font-weight: ${theme.fontWeightStrong};
         }
-    `}
+    `;
+    }}
 `;
 
 const ErrorMessage = styled.div`
@@ -159,7 +174,11 @@ function buildColumns(
             dataIndex,
             align: node.align || 'right',
             width: node.width,
-            className: node.isSubtotalColumn ? 'mht-subtotal-col' : undefined,
+            className: node.isGrandTotalColumn
+                ? 'mht-total-col'
+                : node.isSubtotalColumn
+                    ? 'mht-subtotal-col'
+                    : undefined,
             sorter: sortGroupColumns
                 ? makeGroupSorter(dataIndex, sortGroupColumns)
                 : undefined,

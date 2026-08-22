@@ -224,7 +224,7 @@ function resolvePivotNode(
             numberFormat: node.numberFormat,
             align: node.align,
             width: node.width,
-            isSubtotalColumn: true,
+            isGrandTotalColumn: true,
         };
         if (node.pivot!.colGrandTotalPosition === 'start') {
             headerNodes.unshift(grandTotalNode);

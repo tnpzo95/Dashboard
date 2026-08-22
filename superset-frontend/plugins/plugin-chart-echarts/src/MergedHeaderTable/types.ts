@@ -79,8 +79,13 @@ export interface HeaderNode {
     children?: HeaderNode[];
     // Internal flag set by resolvePivotNode on the "Subtotal" leaf it
     // auto-inserts for `pivot.colSubtotals` -- never set from the JSON/UI --
-    // so MergedHeaderTableViz can bold that column.
+    // so MergedHeaderTableViz can style that column.
     isSubtotalColumn?: boolean;
+    // Internal flag set by resolvePivotNode on the "Total" leaf it
+    // auto-inserts for `pivot.colGrandTotal` -- never set from the JSON/UI --
+    // so MergedHeaderTableViz can style it distinctly from a per-group
+    // Subtotal column.
+    isGrandTotalColumn?: boolean;
 }
 
 export interface HeaderTreeConfig {
