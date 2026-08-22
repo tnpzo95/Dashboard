@@ -213,8 +213,79 @@ function createCustomizeSection(
             'Only show the total value on the stacked chart, and not show on the selected category',
           ),
           visibility: ({ controls }: ControlPanelsContainerProps) =>
-            Boolean(controls?.show_value?.value) &&
-            Boolean(controls?.stack?.value),
+            Boolean(controls?.[`show_value${controlSuffix}`]?.value) &&
+            Boolean(controls?.[`stack${controlSuffix}`]?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: `valueLabelRotation${controlSuffix}`,
+        config: {
+          type: 'SelectControl',
+          freeForm: false,
+          clearable: false,
+          label: t('Value label rotation'),
+          choices: [
+            [0, '0°'],
+            [15, '15°'],
+            [30, '30°'],
+            [45, '45°'],
+            [60, '60°'],
+            [75, '75°'],
+            [90, '90°'],
+          ],
+          default: 0,
+          renderTrigger: true,
+          description: t(
+            'Rotation angle of the value labels shown on the bars/lines',
+          ),
+          visibility: ({ controls }: ControlPanelsContainerProps) =>
+            Boolean(controls?.[`show_value${controlSuffix}`]?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: `valueLabelPosition${controlSuffix}`,
+        config: {
+          type: 'SelectControl',
+          freeForm: false,
+          clearable: false,
+          label: t('Value label position'),
+          choices: [
+            ['top', t('Top')],
+            ['inside', t('Center')],
+            ['insideTop', t('Inside Top')],
+            ['insideBottom', t('Inside Bottom')],
+            ['left', t('Left')],
+            ['right', t('Right')],
+            ['bottom', t('Bottom')],
+          ],
+          default: null,
+          renderTrigger: true,
+          description: t(
+            'Where to place the value label relative to the bar/line point. Defaults to Top for vertical bars and Right for horizontal bars.',
+          ),
+          visibility: ({ controls }: ControlPanelsContainerProps) =>
+            Boolean(controls?.[`show_value${controlSuffix}`]?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: `valueLabelMargin${controlSuffix}`,
+        config: {
+          type: 'TextControl',
+          isInt: true,
+          label: t('Value label margin'),
+          default: 10,
+          renderTrigger: true,
+          description: t(
+            'Distance in pixels between the value label and the bar/line point',
+          ),
+          visibility: ({ controls }: ControlPanelsContainerProps) =>
+            Boolean(controls?.[`show_value${controlSuffix}`]?.value),
         },
       },
     ],
