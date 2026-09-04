@@ -63,6 +63,23 @@ WHERE c.FACTORY = 'DV01'
     AND RES_ID = :device_id
 GROUP BY RES_ID, WORK_DATE
 """
+NODE_WORKER_SQL = """
+SELECT c.WORKER_ID, c.WORKER_DESC, c.CMF_1 AS WORKER_LEVEL
+FROM CWIPWRKDEF c
+WHERE c.WORKER_ID IN (
+    SELECT USER_NAME
+    FROM (
+        SELECT USER_NAME, LOG_TIME,
+            ROW_NUMBER() OVER (
+                PARTITION BY A.RES_ID ORDER BY A.LOG_TIME DESC
+            ) AS RN
+        FROM CLOGMESDAT A
+        WHERE A.LOG_TIME > TO_CHAR(SYSDATE - 1, 'YYYYMMDDHH24MISS')
+            AND A.RES_ID = :device_id
+    )
+    WHERE RN = 1
+)
+"""
 NODE_STATUS_SYNC_SQL = """
 SELECT
     FACTORY,
@@ -1032,6 +1049,36 @@ def _node_down_time_payload(device_id: str) -> dict[str, Any]:
     }
 
 
+def _node_worker_payload(device_id: str) -> dict[str, Any]:
+    database = _get_oracle_product_database()
+    with database.get_sqla_engine() as engine:
+        with engine.connect() as connection:
+            row = (
+                connection.execute(
+                    text(NODE_WORKER_SQL),
+                    {"device_id": device_id},
+                )
+                .mappings()
+                .first()
+            )
+
+    if row is None:
+        return {
+            "resId": device_id,
+            "workerId": "",
+            "workerDesc": "",
+            "workerLevel": "",
+        }
+
+    row_dict = dict(row)
+    return {
+        "resId": device_id,
+        "workerId": _clean_mes_value(_row_value(row_dict, "WORKER_ID")),
+        "workerDesc": _clean_mes_value(_row_value(row_dict, "WORKER_DESC")),
+        "workerLevel": _clean_mes_value(_row_value(row_dict, "WORKER_LEVEL")),
+    }
+
+
 def _fetch_node_status_sync_rows() -> list[dict[str, Any]]:
     database = _get_oracle_product_database()
     with database.get_sqla_engine() as engine:
@@ -1362,6 +1409,38 @@ class FactoryStatusRestApi(BaseSupersetApi):
             return self.response_400(message="Missing device identifier")
 
         return self.response(200, result=_node_down_time_payload(device_id))
+
+    @expose("/public/eapmes/node_worker/", methods=("POST",))
+    @safe
+    @statsd_metrics
+    @requires_json
+    def get_node_worker(self) -> Response:
+        """Get the latest worker for a node from Oracle_Product by device ID.
+        ---
+        post:
+          summary: Get the latest worker for a node from Oracle_Product by device ID
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/FactoryStatusNodeQuantityRequestSchema'
+          responses:
+            200:
+              description: Factory status node worker
+            400:
+              $ref: '#/components/responses/400'
+        """
+        try:
+            payload = factory_status_node_quantity_request_schema.load(request.json)
+        except ValidationError as error:
+            return self.response_400(message=error.messages)
+
+        device_id = _public_node_identifier(payload)
+        if not device_id:
+            return self.response_400(message="Missing device identifier")
+
+        return self.response(200, result=_node_worker_payload(device_id))
 
     @expose("/sync_status/", methods=("POST",))
     @protect()

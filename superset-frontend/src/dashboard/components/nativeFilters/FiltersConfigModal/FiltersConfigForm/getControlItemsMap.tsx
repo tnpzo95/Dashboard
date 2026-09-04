@@ -172,10 +172,27 @@ export default function getControlItemsMap({
         controlItem.name !== 'operatorType',
     )
     .forEach(controlItem => {
+      const isCustomDateRangeControl = controlItem.name.startsWith(
+        'defaultFillterDate',
+      );
+      const isCustomDateRangeEnabled =
+        form.getFieldValue('filters')?.[filterId]?.controlValues
+          ?.defaultFillterCustomRange;
+      if (isCustomDateRangeControl && !isCustomDateRangeEnabled) {
+        return;
+      }
       const initialValue =
         filterToEdit?.controlValues?.[controlItem.name] ??
         customizationToEdit?.controlValues?.[controlItem.name] ??
         controlItem?.config?.default;
+      const isTimeUnitControl = /(?:Hour|Minute)$/.test(controlItem.name);
+      const dateRangeControlClassName = isCustomDateRangeControl
+        ? `relative-time-range-control${
+          controlItem.name === 'defaultFillterDateToDaysAgo'
+            ? ' relative-time-range-control--to'
+            : ''
+        }`
+        : undefined;
       const element =
         controlItem.config.type === 'InputNumber' ? (
           <>
@@ -189,6 +206,7 @@ export default function getControlItemsMap({
             />
             <StyledRowFormItem
               expanded={expanded}
+              className={dateRangeControlClassName}
               key={controlItem.name}
               name={['filters', filterId, 'controlValues', controlItem.name]}
               initialValue={initialValue}
@@ -214,6 +232,15 @@ export default function getControlItemsMap({
             >
               <InputNumber
                 min={controlItem.config.min}
+                max={controlItem.config.max}
+                formatter={
+                  isTimeUnitControl
+                    ? value =>
+                      value === undefined || value === null || value === ''
+                        ? ''
+                        : String(value).padStart(2, '0')
+                    : undefined
+                }
                 disabled={controlItem.config.affectsDataMask && disabled}
                 onChange={value => {
                   const previous =
@@ -274,12 +301,7 @@ export default function getControlItemsMap({
                               const defaultOptions =
                                 currentFilter?.filterType === 'filter_time'
                                   ? [
-                                    'defaultFillterTimeNow',
-                                    'defaultFillterWeekNow',
-                                    'defaultFillterMonthNow',
-                                    'defaultFillterShiftNow',
-                                    'defaultFillterDaysAgo',
-                                    'defaultFillterShiftDaysAgo',
+                                    'defaultFillterCustomRange',
                                   ]
                                   : [
                                     'defaultFillterTimeNow',

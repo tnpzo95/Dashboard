@@ -123,6 +123,13 @@ type NodeDownTime = {
   downTime?: number;
 };
 
+type NodeWorker = {
+  resId?: string;
+  workerId?: string;
+  workerDesc?: string;
+  workerLevel?: string;
+};
+
 const alarmGroupPrefixes = ['USC', 'FTR', 'ISM', 'AGB', 'PFL'];
 
 type StatusConfig = {
@@ -847,10 +854,26 @@ function normalizeLayout(layout: FactoryLayout): FactoryLayout {
   };
 }
 
+function getWorkerInfoRows(worker?: NodeWorker): InfoRow[] {
+  if (!worker || !worker.workerId) {
+    return [];
+  }
+  return [
+    {
+      label: 'WORKER',
+      value: `${worker.workerId} - ${worker.workerDesc || ''} - LEVEL ${
+        worker.workerLevel || ''
+      }`,
+      color: '#1985a1',
+    },
+  ];
+}
+
 function getInfoRows(
   node: FactoryNode,
   quantity?: NodeQuantity,
   downTime?: NodeDownTime,
+  worker?: NodeWorker,
 ): InfoRow[] {
   if (node.status === 'run') {
     return [
@@ -867,6 +890,7 @@ function getInfoRows(
         value: getDetailValue(node, ['RECIPE', 'Recipe', 'recipe']),
       },
       ...getQuantityInfoRows(node, quantity, downTime),
+      ...getWorkerInfoRows(worker),
     ];
   }
 
@@ -907,6 +931,7 @@ function getInfoRows(
       value: getDetailValue(node, ['RECIPE', 'Recipe', 'recipe']),
     },
     ...getQuantityInfoRows(node, quantity, downTime),
+    ...getWorkerInfoRows(worker),
   ];
 }
 
@@ -939,6 +964,7 @@ function FactoryStatus({ user }: { user: UserWithPermissionsAndRoles }) {
   const [nodeDownTimes, setNodeDownTimes] = useState<
     Record<string, NodeDownTime>
   >({});
+  const [nodeWorkers, setNodeWorkers] = useState<Record<string, NodeWorker>>({});
 
   const selectedNode = useMemo(
     () => layout.nodes.find(node => node.id === selectedNodeId) || null,
@@ -1122,6 +1148,28 @@ function FactoryStatus({ user }: { user: UserWithPermissionsAndRoles }) {
     [addDangerToast],
   );
 
+  const loadNodeWorker = useCallback(
+    (node: FactoryNode) => {
+      const deviceId = getNodeQuantityDeviceId(node);
+      if (!deviceId) {
+        return;
+      }
+
+      SupersetClient.post({
+        endpoint: '/api/v1/factory_status/public/eapmes/node_worker/',
+        jsonPayload: { RES_ID: deviceId },
+      })
+        .then(({ json }) => {
+          setNodeWorkers(prev => ({
+            ...prev,
+            [node.id]: json.result as NodeWorker,
+          }));
+        })
+        .catch(() => addDangerToast(t('Failed to load node worker')));
+    },
+    [addDangerToast],
+  );
+
   useEffect(() => {
     if (!infoNodeId) {
       return undefined;
@@ -1134,10 +1182,11 @@ function FactoryStatus({ user }: { user: UserWithPermissionsAndRoles }) {
       }
       loadNodeQuantity(currentInfoNode);
       loadNodeDownTime(currentInfoNode);
+      loadNodeWorker(currentInfoNode);
     }, 5 * 60 * 1000);
 
     return () => window.clearInterval(intervalId);
-  }, [infoNodeId, loadNodeDownTime, loadNodeQuantity]);
+  }, [infoNodeId, loadNodeDownTime, loadNodeQuantity, loadNodeWorker]);
 
   const updateSelectedNode = (updates: Partial<FactoryNode>) => {
     if (!selectedNodeId) {
@@ -1284,6 +1333,7 @@ function FactoryStatus({ user }: { user: UserWithPermissionsAndRoles }) {
     setInfoNodeId(node.id);
     loadNodeQuantity(node);
     loadNodeDownTime(node);
+    loadNodeWorker(node);
   };
 
   const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
@@ -1541,6 +1591,7 @@ function FactoryStatus({ user }: { user: UserWithPermissionsAndRoles }) {
                     infoNode,
                     nodeQuantities[infoNode.id],
                     nodeDownTimes[infoNode.id],
+                    nodeWorkers[infoNode.id],
                   ).map(row => (
                     <Fragment key={row.label}>
                       <dt style={{ color: row.color }}>{row.label}</dt>

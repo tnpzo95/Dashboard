@@ -140,6 +140,13 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
     defaultFillterDaysAgoNumber,
     defaultFillterShiftDaysAgo,
     defaultFillterShiftDaysAgoNumber,
+    defaultFillterCustomRange,
+    defaultFillterDateFromDaysAgo,
+    defaultFillterDateFromHour,
+    defaultFillterDateFromMinute,
+    defaultFillterDateToDaysAgo,
+    defaultFillterDateToHour,
+    defaultFillterDateToMinute,
     enableMaxDaysRange,
     maxDaysRange,
     enableHourFilter,
@@ -229,7 +236,8 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
       !!defaultFillterMonthNow ||
       !!defaultFillterShiftNow ||
       !!defaultFillterDaysAgo ||
-      !!defaultFillterShiftDaysAgo;
+      !!defaultFillterShiftDaysAgo ||
+      !!defaultFillterCustomRange;
 
     const currentDefaultConfig = [
       defaultFillterTimeNow,
@@ -240,6 +248,13 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
       defaultFillterDaysAgoNumber,
       defaultFillterShiftDaysAgo,
       defaultFillterShiftDaysAgoNumber,
+      defaultFillterCustomRange,
+      defaultFillterDateFromDaysAgo,
+      defaultFillterDateFromHour,
+      defaultFillterDateFromMinute,
+      defaultFillterDateToDaysAgo,
+      defaultFillterDateToHour,
+      defaultFillterDateToMinute,
     ].join('|');
     const configChanged = prevDefaultConfig.current !== currentDefaultConfig;
     prevDefaultConfig.current = currentDefaultConfig;
@@ -275,9 +290,24 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
         const days = defaultFillterShiftDaysAgoNumber ?? 3;
         start = now.subtract(days, 'day').startOf('day').add(8, 'hour');
         end = now.startOf('day').add(8, 'hour');
+      } else if (defaultFillterCustomRange) {
+        start = now
+          .subtract(defaultFillterDateFromDaysAgo ?? 3, 'day')
+          .startOf('day')
+          .hour(defaultFillterDateFromHour ?? 0)
+          .minute(defaultFillterDateFromMinute ?? 0);
+        end = now
+          .add(defaultFillterDateToDaysAgo ?? 0, 'day')
+          .startOf('day')
+          .hour(defaultFillterDateToHour ?? 23)
+          .minute(defaultFillterDateToMinute ?? 59);
       } else {
         start = now.startOf('month');
         end = now.endOf('month');
+      }
+      if (!showTime) {
+        start = start.startOf('day');
+        end = end.endOf('day');
       }
       handleTimeRangeChange(
         `${start.format(DAYJS_FORMAT)}${SEPARATOR}${end.format(DAYJS_FORMAT)}`,
@@ -297,6 +327,14 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
     defaultFillterDaysAgoNumber,
     defaultFillterShiftDaysAgo,
     defaultFillterShiftDaysAgoNumber,
+    defaultFillterCustomRange,
+    defaultFillterDateFromDaysAgo,
+    defaultFillterDateFromHour,
+    defaultFillterDateFromMinute,
+    defaultFillterDateToDaysAgo,
+    defaultFillterDateToHour,
+    defaultFillterDateToMinute,
+    showTime,
   ]);
 
   // Sync when filterState.value changes from outside (e.g. "Clear all filters")

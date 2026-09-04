@@ -129,6 +129,17 @@ const StyledSettings = styled.div`
     .ant-form-item {
       margin-bottom: ${theme.sizeUnit * 2}px;
     }
+
+    .relative-time-range-control {
+      display: inline-block;
+      min-width: 0 !important;
+      vertical-align: top;
+      width: calc(100% / 3) !important;
+    }
+
+    .relative-time-range-control--to {
+      clear: left;
+    }
   `}
 `;
 const StyledContainer = styled.div`

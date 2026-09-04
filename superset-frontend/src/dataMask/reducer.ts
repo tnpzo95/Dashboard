@@ -160,6 +160,34 @@ function getShiftDaysAgoTimeRange(days: number): string {
   return `${formatDateOnly(fromDate)}T08:00:00 : ${formatDateOnly(now)}T08:00:00`;
 }
 
+function getCustomRelativeTimeRange(
+  fromDaysAgo: number,
+  fromHour: number,
+  fromMinute: number,
+  toDaysAgo: number,
+  toHour: number,
+  toMinute: number,
+  showTime: boolean,
+): string {
+  const now = new Date();
+  const fromDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - fromDaysAgo,
+    showTime ? fromHour : 0,
+    showTime ? fromMinute : 0,
+  );
+  const toDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + toDaysAgo,
+    showTime ? toHour : 23,
+    showTime ? toMinute : 59,
+    showTime ? 0 : 59,
+  );
+  return `${formatDateTime(fromDate)} : ${formatDateTime(toDate)}`;
+}
+
 // Matches DAYJS_FORMAT ('YYYY-MM-DD[T]HH:mm:ss') from
 // src/explore/components/controls/DateFilterControl/utils/constants.ts, so
 // this dynamically-computed default matches what DateTimeFilterPlugin's own
@@ -258,6 +286,19 @@ function fillNativeFilters(
       ) {
         timeRange = getShiftDaysAgoTimeRange(
           filter.controlValues?.defaultFillterShiftDaysAgoNumber ?? 3,
+        );
+      } else if (
+        filter.filterType === 'filter_time' &&
+        filter.controlValues?.defaultFillterCustomRange
+      ) {
+        timeRange = getCustomRelativeTimeRange(
+          filter.controlValues?.defaultFillterDateFromDaysAgo ?? 3,
+          filter.controlValues?.defaultFillterDateFromHour ?? 0,
+          filter.controlValues?.defaultFillterDateFromMinute ?? 0,
+          filter.controlValues?.defaultFillterDateToDaysAgo ?? 0,
+          filter.controlValues?.defaultFillterDateToHour ?? 23,
+          filter.controlValues?.defaultFillterDateToMinute ?? 59,
+          filter.controlValues?.enableHourFilter !== false,
         );
       }
       if (timeRange) {

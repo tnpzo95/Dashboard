@@ -39,8 +39,44 @@ import {
   COLUMN_TYPE,
   ROW_TYPE,
 } from '../../../util/componentTypes';
-import ChartHolder, { CHART_MARGIN } from './ChartHolder';
 import { GRID_BASE_UNIT, GRID_GUTTER_SIZE } from '../../../util/constants';
+import { DataMaskStateWithId } from '@superset-ui/core';
+import ChartHolder, {
+  CHART_MARGIN,
+  parseChartVisibilityConfig,
+  shouldHideForChartVisibility,
+} from './ChartHolder';
+
+test('hides a chart when its filter value does not match an IN visibility rule', () => {
+  const config = parseChartVisibilityConfig({
+    filterId: 'status-filter',
+    values: ['active'],
+  });
+  const dataMask = {
+    'status-filter': {
+      id: 'status-filter',
+      filterState: { value: ['inactive'] },
+    },
+  } as DataMaskStateWithId;
+
+  expect(shouldHideForChartVisibility(config, dataMask)).toBe(true);
+});
+
+test('shows a chart when its filter value matches a visibility rule', () => {
+  const config = parseChartVisibilityConfig({
+    filterId: 'status-filter',
+    operator: 'IN',
+    values: ['active'],
+  });
+  const dataMask = {
+    'status-filter': {
+      id: 'status-filter',
+      filterState: { value: ['active'] },
+    },
+  } as DataMaskStateWithId;
+
+  expect(shouldHideForChartVisibility(config, dataMask)).toBe(false);
+});
 
 const DEFAULT_HEADER_HEIGHT = 22;
 

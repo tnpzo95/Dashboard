@@ -78,153 +78,94 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'defaultFillterTimeNow',
+            name: 'defaultFillterCustomRange',
             config: {
               type: 'CheckboxControl',
-              label: t('Default to current time'),
+              label: t('Default to custom relative time range'),
               default: false,
               renderTrigger: true,
               description: t(
-                'When checked, the filter defaults to today (00:00 to 23:59) on load.',
+                'When checked, configure Date from and Date to independently relative to today.',
               ),
-              mutuallyExclusiveWith: [
-                'defaultFillterWeekNow',
-                'defaultFillterMonthNow',
-                'defaultFillterShiftNow',
-                'defaultFillterDaysAgo',
-              ],
             },
           },
         ],
         [
           {
-            name: 'defaultFillterWeekNow',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Default to current week'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'When checked, the filter defaults to the current week (Monday 00:00 to Sunday 23:59) on load.',
-              ),
-              mutuallyExclusiveWith: [
-                'defaultFillterTimeNow',
-                'defaultFillterMonthNow',
-                'defaultFillterShiftNow',
-                'defaultFillterDaysAgo',
-              ],
-            },
-          },
-        ],
-        [
-          {
-            name: 'defaultFillterMonthNow',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Default to current month'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'When checked, the filter defaults to the current month (1st to last day, 00:00 to 23:59) on load.',
-              ),
-              mutuallyExclusiveWith: [
-                'defaultFillterTimeNow',
-                'defaultFillterWeekNow',
-                'defaultFillterShiftNow',
-                'defaultFillterDaysAgo',
-              ],
-            },
-          },
-        ],
-        [
-          {
-            name: 'defaultFillterShiftNow',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Default to work shift (08:00 today → 08:00 tomorrow)'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'When checked, the filter defaults to the current work shift: 08:00 today to 08:00 the next day.',
-              ),
-              mutuallyExclusiveWith: [
-                'defaultFillterTimeNow',
-                'defaultFillterWeekNow',
-                'defaultFillterMonthNow',
-                'defaultFillterDaysAgo',
-              ],
-            },
-          },
-        ],
-        [
-          {
-            name: 'defaultFillterDaysAgo',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Default to N days ago'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'When checked, the filter defaults to N days ago (00:00) through today (23:59) on load.',
-              ),
-              mutuallyExclusiveWith: [
-                'defaultFillterTimeNow',
-                'defaultFillterWeekNow',
-                'defaultFillterMonthNow',
-                'defaultFillterShiftNow',
-                'defaultFillterShiftDaysAgo',
-              ],
-            },
-          },
-        ],
-        [
-          {
-            name: 'defaultFillterDaysAgoNumber',
+            name: 'defaultFillterDateFromDaysAgo',
             config: {
               type: 'InputNumber',
-              label: t('Number of days'),
+              label: t('Date from: days ago'),
               default: 3,
               renderTrigger: true,
-              min: 1,
+              min: 0,
               description: t(
-                'Number of days to go back from today when "Default to N days ago" is enabled.',
+                'Days before today for the start of the default range. Use 0 for today.',
               ),
             },
           },
-        ],
-        [
           {
-            name: 'defaultFillterShiftDaysAgo',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Default to N days ago (from 8:00)'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'When checked, the filter defaults to N days ago at 08:00 through today at 08:00 on load.',
-              ),
-              mutuallyExclusiveWith: [
-                'defaultFillterTimeNow',
-                'defaultFillterWeekNow',
-                'defaultFillterMonthNow',
-                'defaultFillterShiftNow',
-                'defaultFillterDaysAgo',
-              ],
-            },
-          },
-        ],
-        [
-          {
-            name: 'defaultFillterShiftDaysAgoNumber',
+            name: 'defaultFillterDateFromHour',
             config: {
               type: 'InputNumber',
-              label: t('Number of days'),
-              default: 3,
+              label: t('Date from: hour'),
+              default: 0,
               renderTrigger: true,
-              min: 1,
+              min: 0,
+              max: 23,
+              description: t('Hour for the start of the default range (0-23).'),
+            },
+          },
+          {
+            name: 'defaultFillterDateFromMinute',
+            config: {
+              type: 'InputNumber',
+              label: t('Date from: minute'),
+              default: 0,
+              renderTrigger: true,
+              min: 0,
+              max: 59,
               description: t(
-                'Number of days to go back from today when "Default to N days ago (from 8:00)" is enabled.',
+                'Minute for the start of the default range (0-59).',
               ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'defaultFillterDateToDaysAgo',
+            config: {
+              type: 'InputNumber',
+              label: t('Date to: offset days'),
+              default: 0,
+              renderTrigger: true,
+              description: t(
+                'Days relative to today for the end of the default range. Use a negative value for a past day, 0 for today, or a positive value for a future day.',
+              ),
+            },
+          },
+          {
+            name: 'defaultFillterDateToHour',
+            config: {
+              type: 'InputNumber',
+              label: t('Date to: hour'),
+              default: 23,
+              renderTrigger: true,
+              min: 0,
+              max: 23,
+              description: t('Hour for the end of the default range (0-23).'),
+            },
+          },
+          {
+            name: 'defaultFillterDateToMinute',
+            config: {
+              type: 'InputNumber',
+              label: t('Date to: minute'),
+              default: 59,
+              renderTrigger: true,
+              min: 0,
+              max: 59,
+              description: t('Minute for the end of the default range (0-59).'),
             },
           },
         ],

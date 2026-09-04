@@ -22,6 +22,7 @@ import { ResizeCallback, ResizeStartCallback } from 're-resizable';
 import cx from 'classnames';
 import { useSelector } from 'react-redux';
 import { css, useTheme } from '@apache-superset/core/theme';
+import { DataMaskStateWithId } from '@superset-ui/core';
 import { LayoutItem, RootState } from 'src/dashboard/types';
 import AnchorLink from 'src/dashboard/components/AnchorLink';
 import Chart from 'src/dashboard/components/gridComponents/Chart';
@@ -51,6 +52,14 @@ type RotatorZoneConfig = {
   intervalMs: number;
   transitionMs: number;
   enabled: boolean;
+};
+
+type VisibilityOperator = 'IN' | 'NOT IN';
+
+type ChartVisibilityConfig = {
+  filterId: string;
+  operator: VisibilityOperator;
+  values: Array<string | number | boolean>;
 };
 
 function parseChartId(value: unknown): number | null {
@@ -160,6 +169,78 @@ function getHiddenChartIds(
   return parseChartIds(hiddenChartIds);
 }
 
+export function parseChartVisibilityConfig(
+  value: unknown,
+): ChartVisibilityConfig | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const rawConfig = value as Record<string, unknown>;
+  const filterId = rawConfig.filterId;
+  const values = rawConfig.values;
+  if (
+    (typeof filterId !== 'string' && typeof filterId !== 'number') ||
+    !Array.isArray(values) ||
+    !values.every(
+      item =>
+        typeof item === 'string' ||
+        typeof item === 'number' ||
+        typeof item === 'boolean',
+    )
+  ) {
+    return null;
+  }
+
+  const operator =
+    rawConfig.operator === 'NOT IN' || rawConfig.operator === 'NOT_IN'
+      ? 'NOT IN'
+      : 'IN';
+
+  return { filterId: String(filterId), operator, values };
+}
+
+function getChartVisibilityConfig(
+  metadata: RootState['dashboardInfo']['metadata'] | undefined,
+  chartId?: number,
+): ChartVisibilityConfig | null {
+  if (chartId === undefined) {
+    return null;
+  }
+
+  const chartVisibilityConfig = (
+    metadata as Record<string, unknown> | undefined
+  )?.dashboard_chart_visibility;
+  if (!chartVisibilityConfig || typeof chartVisibilityConfig !== 'object') {
+    return null;
+  }
+
+  return parseChartVisibilityConfig(
+    (chartVisibilityConfig as Record<string, unknown>)[String(chartId)],
+  );
+}
+
+export function shouldHideForChartVisibility(
+  config: ChartVisibilityConfig | null,
+  dataMask: DataMaskStateWithId,
+): boolean {
+  if (!config) {
+    return false;
+  }
+
+  const filterValue = dataMask[config.filterId]?.filterState?.value;
+  const selectedValues = Array.isArray(filterValue)
+    ? filterValue
+    : filterValue === undefined || filterValue === null
+      ? []
+      : [filterValue];
+  const matches = selectedValues.some(selectedValue =>
+    config.values.some(value => String(value) === String(selectedValue)),
+  );
+
+  return config.operator === 'IN' ? !matches : matches;
+}
+
 export interface ChartHolderProps {
   id: string;
   parentId: string;
@@ -235,6 +316,13 @@ const ChartHolder = ({
     () => getHiddenChartIds(dashboardMetadata),
     [dashboardMetadata],
   );
+  const dataMask = useSelector<RootState, DataMaskStateWithId>(
+    state => state.dataMask,
+  );
+  const chartVisibilityConfig = useMemo(
+    () => getChartVisibilityConfig(dashboardMetadata, chartId),
+    [chartId, dashboardMetadata],
+  );
   const [rotatorIndex, setRotatorIndex] = useState(0);
   const [isRotatorFading, setIsRotatorFading] = useState(false);
   const rotatorChartIds = useMemo(() => {
@@ -265,7 +353,9 @@ const ChartHolder = ({
   );
   const isFullSize = fullSizeChartId === chartId;
   const shouldHideComponent =
-    !editMode && chartId !== undefined && hiddenChartIds.includes(chartId);
+    !editMode &&
+    ((chartId !== undefined && hiddenChartIds.includes(chartId)) ||
+      shouldHideForChartVisibility(chartVisibilityConfig, dataMask));
 
   const focusHighlightStyles = useFilterFocusHighlightStyles(chartId ?? 0);
   const directPathToChild = useSelector(

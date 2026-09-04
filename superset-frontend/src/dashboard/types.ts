@@ -192,6 +192,7 @@ export type DashboardInfo = {
       | ChartCustomizationDivider
     )[];
     timed_refresh_immune_slices?: number[];
+    dashboard_chart_visibility?: JsonObject;
     refresh_frequency?: number;
     positions?: JsonObject;
     filter_scopes?: JsonObject;
