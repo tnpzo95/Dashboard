@@ -56,6 +56,7 @@ import {
 import { dashboardInfoChanged } from 'src/dashboard/actions/dashboardInfo';
 import { areObjectsEqual } from 'src/reduxUtils';
 import { StandardModal, useModalValidation } from 'src/components/Modal';
+import getUserGuideUrl from 'src/dashboard/util/getUserGuideUrl';
 import { validateRefreshFrequency } from '../RefreshFrequency';
 import {
   BasicInfoSection,
@@ -186,6 +187,7 @@ const PropertiesModal = ({
         id,
         title: dashboard_title,
         slug: slug || '',
+        userGuideUrl: metadata?.user_guide_url || '',
         certifiedBy: certified_by || '',
         certificationDetails: certification_details || '',
         isManagedExternally: is_managed_externally || false,
@@ -210,6 +212,7 @@ const PropertiesModal = ({
         'map_label_colors',
         'color_scheme_domain',
         'show_chart_timestamps',
+        'user_guide_url',
       ]);
 
       setJsonMetadata(metaDataCopy ? jsonStringify(metaDataCopy) : '');
@@ -317,7 +320,7 @@ const PropertiesModal = ({
   };
 
   const onFinish = () => {
-    const { title, slug, certifiedBy, certificationDetails } =
+    const { title, slug, certifiedBy, certificationDetails, userGuideUrl } =
       form.getFieldsValue();
     let currentJsonMetadata = jsonMetadata;
 
@@ -358,12 +361,14 @@ const PropertiesModal = ({
     const jsonMetadataObj = getJsonMetadata();
     jsonMetadataObj.refresh_frequency = refreshFrequency;
     jsonMetadataObj.show_chart_timestamps = Boolean(showChartTimestamps);
+    jsonMetadataObj.user_guide_url = getUserGuideUrl(userGuideUrl) || null;
     const customLabelColors = jsonMetadataObj.label_colors || {};
     const updatedDashboardMetadata = {
       ...originalDashboardMetadata.current,
       label_colors: customLabelColors,
       color_scheme: updatedColorScheme,
       show_chart_timestamps: showChartTimestamps,
+      user_guide_url: jsonMetadataObj.user_guide_url,
     };
 
     originalDashboardMetadata.current = updatedDashboardMetadata;
@@ -566,6 +571,15 @@ const PropertiesModal = ({
           // Check validation - only add if title is empty
           if (!values.title || values.title.trim().length === 0) {
             errors.push(t('Dashboard name is required'));
+          }
+
+          if (
+            values.userGuideUrl?.trim() &&
+            !getUserGuideUrl(values.userGuideUrl)
+          ) {
+            errors.push(
+              t('Enter a valid URL starting with http:// or https://'),
+            );
           }
 
           return errors;

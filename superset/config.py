@@ -963,7 +963,7 @@ THEME_DEFAULT: Theme = {
         "fontSizeXXL": "28",
         "fontWeightNormal": "400",
         "fontWeightLight": "300",
-        "fontWeightStrong": "500",
+        "fontWeightStrong": "700",
         "fontWeightBold": "700",
         # Editor selection color (for SQL Lab text highlighting)
         "colorEditorSelection": "#fff5cf"

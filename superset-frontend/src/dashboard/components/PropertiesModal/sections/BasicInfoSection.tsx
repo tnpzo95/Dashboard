@@ -20,6 +20,7 @@ import { t } from '@apache-superset/core/translation';
 import { FormItem, Input, FormInstance } from '@superset-ui/core/components';
 import { ModalFormField } from 'src/components/Modal';
 import { ValidationObject } from 'src/components/Modal/useModalValidation';
+import getUserGuideUrl from 'src/dashboard/util/getUserGuideUrl';
 
 interface BasicInfoSectionProps {
   form: FormInstance;
@@ -34,6 +35,11 @@ const BasicInfoSection = ({
   const hasError =
     validationStatus.basic?.hasErrors &&
     (!titleValue || titleValue.trim().length === 0);
+  const userGuideUrl: string = form.getFieldValue('userGuideUrl') || '';
+  const hasGuideUrlError =
+    validationStatus.basic?.hasErrors &&
+    userGuideUrl.trim() &&
+    !getUserGuideUrl(userGuideUrl);
 
   return (
     <>
@@ -61,15 +67,50 @@ const BasicInfoSection = ({
           />
         </FormItem>
       </ModalFormField>
-      <ModalFormField
-        label={t('URL Slug')}
-        testId="dashboard-slug-field"
-        bottomSpacing={false}
-      >
+      <ModalFormField label={t('URL Slug')} testId="dashboard-slug-field">
         <FormItem name="slug" noStyle>
           <Input
             placeholder={t('A readable URL for your dashboard')}
             data-test="dashboard-slug-input"
+            type="text"
+          />
+        </FormItem>
+      </ModalFormField>
+      <ModalFormField
+        label={t('User guide URL')}
+        helperText={t(
+          'Opens the user guide in a new tab. Leave empty to hide the button.',
+        )}
+        error={
+          hasGuideUrlError
+            ? t('Enter a valid URL starting with http:// or https://')
+            : undefined
+        }
+        testId="dashboard-user-guide-field"
+        bottomSpacing={false}
+      >
+        <FormItem
+          name="userGuideUrl"
+          noStyle
+          rules={[
+            {
+              validator: (_, value: string) =>
+                !value?.trim() || getUserGuideUrl(value)
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error(
+                        t(
+                          'Enter a valid URL starting with http:// or https://',
+                        ),
+                      ),
+                    ),
+            },
+          ]}
+        >
+          <Input
+            aria-label={t('User guide URL')}
+            placeholder="https://example.com/dashboard-guide"
+            data-test="dashboard-user-guide-input"
             type="text"
           />
         </FormItem>

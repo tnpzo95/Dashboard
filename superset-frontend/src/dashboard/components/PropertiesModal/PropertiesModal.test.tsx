@@ -183,6 +183,114 @@ afterAll(() => {
   fetchMock.clearHistory().removeRoutes();
 });
 
+test.each([
+  {
+    initialUrl: '',
+    enteredUrl: ' https://docs.example.com/guide ',
+    expectedUrl: 'https://docs.example.com/guide',
+    onlyApply: true,
+  },
+  {
+    initialUrl: 'https://docs.example.com/old',
+    enteredUrl: 'http://intranet/guide',
+    expectedUrl: 'http://intranet/guide',
+    onlyApply: false,
+  },
+  {
+    initialUrl: 'https://docs.example.com/guide',
+    enteredUrl: '',
+    expectedUrl: null,
+    onlyApply: false,
+  },
+])(
+  'saves the dashboard guide as $expectedUrl (onlyApply=$onlyApply)',
+  async ({ initialUrl, enteredUrl, expectedUrl, onlyApply }) => {
+    mockedIsFeatureEnabled.mockReturnValue(false);
+    const put = jest
+      .spyOn(SupersetCore.SupersetClient, 'put')
+      .mockResolvedValue({ response: new Response(), json: {} });
+    const props = { ...createProps(), onlyApply };
+    render(
+      <PropertiesModal
+        {...props}
+        dashboardInfo={{
+          ...dashboardInfo,
+          metadata: {
+            color_scheme: 'supersetColors',
+            refresh_frequency: 30,
+            user_guide_url: initialUrl,
+          },
+        }}
+      />,
+      { useRedux: true },
+    );
+    const input = await screen.findByRole('textbox', {
+      name: 'User guide URL',
+    });
+    expect(input).toHaveValue(initialUrl);
+    await userEvent.clear(input);
+    if (enteredUrl) await userEvent.type(input, enteredUrl);
+    await userEvent.click(
+      screen.getByRole('button', { name: onlyApply ? 'Apply' : 'Save' }),
+    );
+    await waitFor(() => expect(props.onSubmit).toHaveBeenCalledTimes(1));
+    const metadata = JSON.parse(props.onSubmit.mock.calls[0][0].jsonMetadata);
+    expect(metadata.user_guide_url).toBe(expectedUrl);
+    expect(metadata.refresh_frequency).toBe(30);
+    const savedUrls = put.mock.calls.map(([request]) => {
+      const requestBody = JSON.parse(String(request.body));
+      return JSON.parse(requestBody.json_metadata).user_guide_url;
+    });
+    expect(savedUrls).toEqual(onlyApply ? [] : [expectedUrl]);
+    put.mockRestore();
+  },
+);
+
+test('rejects invalid guide URLs and allows clearing the optional field', async () => {
+  mockedIsFeatureEnabled.mockReturnValue(false);
+  const props = { ...createProps(), onlyApply: true };
+  render(
+    <PropertiesModal
+      {...props}
+      dashboardInfo={{ ...dashboardInfo, metadata: {} }}
+    />,
+    { useRedux: true },
+  );
+  const input = await screen.findByRole('textbox', { name: 'User guide URL' });
+  // eslint-disable-next-line no-script-url -- Verify that unsafe guide links are rejected.
+  await userEvent.type(input, 'javascript:alert(1)');
+  expect(
+    await screen.findByText(
+      'Enter a valid URL starting with http:// or https://',
+    ),
+  ).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+  expect(props.onSubmit).not.toHaveBeenCalled();
+  await userEvent.clear(input);
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled(),
+  );
+});
+
+test('cancelling guide changes does not submit them', async () => {
+  mockedIsFeatureEnabled.mockReturnValue(false);
+  const props = { ...createProps(), onlyApply: true };
+  render(
+    <PropertiesModal
+      {...props}
+      dashboardInfo={{ ...dashboardInfo, metadata: {} }}
+    />,
+    { useRedux: true },
+  );
+  await userEvent.type(
+    await screen.findByRole('textbox', { name: 'User guide URL' }),
+    'https://docs.example.com/guide',
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(props.onSubmit).not.toHaveBeenCalled();
+  expect(props.onHide).toHaveBeenCalled();
+});
+
 // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('PropertiesModal', () => {
   jest.setTimeout(60000); // Increased timeout for complex modal rendering
@@ -212,7 +320,7 @@ describe('PropertiesModal', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
 
     // Only General information section is expanded by default
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Name and Slug
+    expect(screen.getAllByRole('textbox')).toHaveLength(3); // Name, slug, and guide URL
 
     // Expand Styling section to see the ColorSchemeControlWrapper
     const stylingHeaderText = screen.getByText('Styling');
@@ -257,7 +365,7 @@ describe('PropertiesModal', () => {
     expect(screen.getByText('Certification')).toBeInTheDocument();
 
     // General information section is expanded by default
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Name and Slug are visible
+    expect(screen.getAllByRole('textbox')).toHaveLength(3); // General information fields
 
     // Expand Access & ownership to see Tags
     const accessPanel = screen
@@ -302,7 +410,7 @@ describe('PropertiesModal', () => {
       await screen.findByTestId('dashboard-edit-properties-form'),
     ).toBeInTheDocument();
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Only Name and Slug visible initially
+    expect(screen.getAllByRole('textbox')).toHaveLength(3); // General information fields
 
     // Click on the Advanced settings collapse panel to expand it
     const advancedHeaderText = screen.getByText('Advanced settings');

@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import logging
 from copy import deepcopy
 from datetime import datetime, timezone, timedelta
 from typing import Any
@@ -37,6 +38,8 @@ from superset.factory_status.schemas import (
 )
 from superset.models.core import Database
 from superset.views.base_api import BaseSupersetApi, requires_json, statsd_metrics
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_LAYOUT_NAME = "default"
 ORACLE_PRODUCT_DATABASE_NAME = "Oracle_Product"
@@ -1049,13 +1052,49 @@ def _node_down_time_payload(device_id: str) -> dict[str, Any]:
     }
 
 
+NODE_WORKER_TASK_TYPE = "node_worker"
+
+
+def _get_node_worker_sql() -> str:
+    """Return the editable worker SQL from factory_status_task_configs.
+
+    Falls back to the built-in NODE_WORKER_SQL when no config row exists.
+    The query must keep the ``:device_id`` bind parameter (node RES_ID).
+    """
+    try:
+        row = (
+            db.session.execute(
+                text(
+                    """
+                    SELECT sql_query
+                    FROM factory_status_task_configs
+                    WHERE task_type = :task_type
+                      AND is_active = TRUE
+                    ORDER BY id
+                    """
+                ),
+                {"task_type": NODE_WORKER_TASK_TYPE},
+            )
+            .mappings()
+            .first()
+        )
+    except Exception:  # pylint: disable=broad-except
+        logger.exception("Failed to load node_worker sql config")
+        row = None
+
+    if row and str(row["sql_query"]).strip():
+        return str(row["sql_query"])
+    return NODE_WORKER_SQL
+
+
 def _node_worker_payload(device_id: str) -> dict[str, Any]:
+    worker_sql = _get_node_worker_sql()
     database = _get_oracle_product_database()
     with database.get_sqla_engine() as engine:
         with engine.connect() as connection:
             row = (
                 connection.execute(
-                    text(NODE_WORKER_SQL),
+                    text(worker_sql),
                     {"device_id": device_id},
                 )
                 .mappings()

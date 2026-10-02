@@ -148,6 +148,47 @@ function setup(overrideState: JsonObject = {}) {
   );
 }
 
+test.each([
+  'https://docs.example.com/guide?dashboard=1#filters',
+  'http://intranet/guide',
+])('shows the dashboard user guide to viewers: %s', userGuideUrl => {
+  setup({
+    dashboardInfo: {
+      ...initialState.dashboardInfo,
+      metadata: { user_guide_url: userGuideUrl },
+    },
+  });
+  const link = screen.getByRole('link', { name: 'User guide' });
+  expect(link).toHaveAttribute('href', userGuideUrl);
+  expect(link).toHaveAttribute('target', '_blank');
+  expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+});
+
+test.each([
+  undefined,
+  null,
+  '',
+  // eslint-disable-next-line no-script-url -- Verify that unsafe guide links are rejected.
+  'javascript:alert(1)',
+  'data:text/html,test',
+  '//example.com/guide',
+  'https://',
+  42,
+])(
+  'hides the dashboard user guide for invalid or missing URLs: %s',
+  userGuideUrl => {
+    setup({
+      dashboardInfo: {
+        ...initialState.dashboardInfo,
+        metadata: { user_guide_url: userGuideUrl },
+      },
+    });
+    expect(
+      screen.queryByRole('link', { name: 'User guide' }),
+    ).not.toBeInTheDocument();
+  },
+);
+
 async function openActionsDropdown() {
   const btn = screen.getByRole('img', { name: 'ellipsis' });
   userEvent.click(btn);
@@ -337,14 +378,15 @@ test('should publish', () => {
   expect(savePublished).toHaveBeenCalledTimes(1);
 });
 
-test('should render metadata', () => {
+test('should hide metadata from the dashboard header', () => {
   setup();
+  expect(screen.queryByTestId('metadata-bar')).not.toBeInTheDocument();
   expect(
-    screen.getByText(getOwnerName(initialState.dashboardInfo.created_by)),
-  ).toBeInTheDocument();
+    screen.queryByText(getOwnerName(initialState.dashboardInfo.created_by)),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByText(initialState.dashboardInfo.changed_on_delta_humanized),
-  ).toBeInTheDocument();
+    screen.queryByText(initialState.dashboardInfo.changed_on_delta_humanized),
+  ).not.toBeInTheDocument();
 });
 
 test('should render the "Undo" action as disabled', () => {
@@ -774,7 +816,7 @@ test('should have fullscreen option in dropdown', async () => {
   expect(screen.queryByText('Enter fullscreen')).not.toBeInTheDocument();
 });
 
-test('should render MetadataBar when not in edit mode and not embedded', () => {
+test('should hide MetadataBar when not in edit mode and not embedded', () => {
   const state = {
     dashboardInfo: {
       ...initialState.dashboardInfo,
@@ -783,8 +825,8 @@ test('should render MetadataBar when not in edit mode and not embedded', () => {
   };
   setup(state);
   expect(
-    screen.getByText(state.dashboardInfo.changed_on_delta_humanized),
-  ).toBeInTheDocument();
+    screen.queryByText(state.dashboardInfo.changed_on_delta_humanized),
+  ).not.toBeInTheDocument();
 });
 
 test('should show UnsavedChangesModal when there are unsaved changes and user tries to navigate', async () => {

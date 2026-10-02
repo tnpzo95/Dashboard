@@ -90,7 +90,7 @@ const ChartHeaderStyles = styled.div`
     const isDark = theme.colorBgBase === "#000" ||
       theme.colorBgBase === "#000000";
     // Background color based on theme mode
-    const headerBg = isDark ? 'blueviolet' : '#4df1f1';
+    const headerBg = isDark ? '#141414' : '#ffffff';
 
     return css`
       font-size: ${theme.fontSizeLG}px;

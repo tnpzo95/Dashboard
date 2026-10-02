@@ -38,6 +38,7 @@ import {
 } from '@superset-ui/core/components';
 import { findPermission } from 'src/utils/findPermission';
 import { safeStringify } from 'src/utils/safeStringify';
+import getUserGuideUrl from 'src/dashboard/util/getUserGuideUrl';
 import Role from 'src/types/Role';
 import Owner from 'src/types/Owner';
 import { DashboardLayout, RootState } from 'src/dashboard/types';
@@ -93,7 +94,7 @@ import { logEvent } from '../../../logger/actions';
 import { dashboardInfoChanged } from '../../actions/dashboardInfo';
 import { ChartState } from 'src/explore/types';
 import { useChartIds } from '../../util/charts/useChartIds';
-import { useDashboardMetadataBar } from './useDashboardMetadataBar';
+// import { useDashboardMetadataBar } from './useDashboardMetadataBar';
 import { useHeaderActionsMenu } from './useHeaderActionsDropdownMenu';
 import { useHeaderAutoRefresh } from './useHeaderAutoRefresh';
 import AutoRefreshIndicator from '../AutoRefreshIndicator';
@@ -539,7 +540,8 @@ const Header = (): JSX.Element => {
     setShowingReportModal(false);
   }, []);
 
-  const metadataBar = useDashboardMetadataBar(dashboardInfo);
+  // const metadataBar = useDashboardMetadataBar(dashboardInfo);
+  const userGuideUrl = getUserGuideUrl(dashboardInfo.metadata?.user_guide_url);
 
   const userCanEdit =
     dashboardInfo.dash_edit_perm && !dashboardInfo.is_managed_externally;
@@ -549,7 +551,7 @@ const Header = (): JSX.Element => {
     isFeatureEnabled(FeatureFlag.EmbeddedSuperset) &&
     findPermission('can_set_embedded', 'Dashboard', user.roles);
   const userCanExport = !!dashboardInfo.dash_export_perm;
-  const isEmbedded = !dashboardInfo?.userId;
+  // const isEmbedded = !dashboardInfo?.userId;
 
   const handleOnPropertiesChange = useCallback(
     (updates: DashboardPropertiesUpdate) => {
@@ -649,14 +651,14 @@ const Header = (): JSX.Element => {
           userCanSave={userCanSaveAs}
         />
       ),
-      !editMode && !isEmbedded && metadataBar,
+      // !editMode && !isEmbedded && metadataBar,
     ],
     [
       boundActionCreators.savePublished,
       dashboardInfo.id,
       editMode,
-      metadataBar,
-      isEmbedded,
+      // metadataBar,
+      // isEmbedded,
       isPublished,
       userCanEdit,
       userCanSaveAs,
@@ -749,6 +751,18 @@ const Header = (): JSX.Element => {
         ) : (
           <div css={actionButtonsStyle}>
             {NavExtension && <NavExtension />}
+            {userGuideUrl && (
+              <Button
+                buttonStyle="secondary"
+                href={userGuideUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="action-button"
+                data-test="dashboard-user-guide-button"
+              >
+                {t('User guide')}
+              </Button>
+            )}
             {userCanEdit && (
               <Button
                 buttonStyle="secondary"
@@ -781,6 +795,7 @@ const Header = (): JSX.Element => {
       undoLength,
       userCanEdit,
       userCanSaveAs,
+      userGuideUrl,
     ],
   );
 

@@ -25,6 +25,8 @@ import type {
   DataMaskStateWithId,
   QueryObjectFilterClause,
 } from '@superset-ui/core';
+import { getDateTimeExtraFormData } from 'src/filters/utils';
+import { getFormData } from '../../utils';
 import {
   FilterConfigMap,
   resolveTransitiveParentIds,
@@ -38,6 +40,62 @@ const buildWrapper = (filters: FilterConfigMap) => {
   return ({ children }: { children: ReactNode }) =>
     createElement(Provider, { store }, children);
 };
+
+test('passes a changed or cleared DateTime value through a dependency chain to the child query', () => {
+  const wrapper = buildWrapper({
+    date: { cascadeParentIds: [] },
+    region: { cascadeParentIds: ['date'] },
+    city: { cascadeParentIds: ['region'] },
+  });
+  const buildDataMask = (value?: string): DataMaskStateWithId => ({
+    date: {
+      id: 'date',
+      extraFormData: getDateTimeExtraFormData('event_time', value),
+    },
+    region: {
+      id: 'region',
+      extraFormData: { filters: [{ col: 'region', op: 'IN', val: ['North'] }] },
+    },
+  });
+  const { result, rerender } = renderHook(
+    ({ dataMask }) => useFilterDependencies('city', dataMask),
+    {
+      wrapper,
+      initialProps: { dataMask: buildDataMask('2026-01-10T12:00:00') },
+    },
+  );
+  const getChildFormData = () =>
+    getFormData({
+      dashboardId: 119,
+      datasetId: 1,
+      groupby: 'city',
+      filterType: 'filter_select',
+      granularity_sqla: 'event_time',
+      dependencies: result.current,
+    });
+
+  expect(getChildFormData().extra_form_data).toEqual({
+    filters: [
+      { col: 'event_time', op: '==', val: '2026-01-10T12:00:00' },
+      { col: 'region', op: 'IN', val: ['North'] },
+    ],
+    time_range: '2026-01-10T12:00:00 : 2026-01-10T12:00:00',
+  });
+
+  rerender({ dataMask: buildDataMask('2026-01-11T12:00:00') });
+  expect(getChildFormData().extra_form_data).toEqual({
+    filters: [
+      { col: 'event_time', op: '==', val: '2026-01-11T12:00:00' },
+      { col: 'region', op: 'IN', val: ['North'] },
+    ],
+    time_range: '2026-01-11T12:00:00 : 2026-01-11T12:00:00',
+  });
+
+  rerender({ dataMask: buildDataMask() });
+  expect(getChildFormData().extra_form_data).toEqual({
+    filters: [{ col: 'region', op: 'IN', val: ['North'] }],
+  });
+});
 
 test('resolveTransitiveParentIds returns empty for a filter with no parents', () => {
   expect(

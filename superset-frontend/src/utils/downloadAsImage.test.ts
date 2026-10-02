@@ -17,6 +17,7 @@
  * under the License.
  */
 import domToImage from 'dom-to-image-more';
+import { SyntheticEvent } from 'react';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
 import downloadAsImageOptimized, {
   waitForStableScrollHeight,
@@ -46,7 +47,7 @@ Object.defineProperty(document, 'fonts', {
 
 // Build a synthetic React event that resolves `currentTarget.closest()` to a given element
 function syntheticEventFor(el: Element) {
-  return { currentTarget: { closest: () => el } } as any;
+  return { currentTarget: { closest: () => el } } as unknown as SyntheticEvent;
 }
 
 // Build and attach an ag-grid DOM structure; returns cleanup function
@@ -547,7 +548,7 @@ test('does not throw when resetRowHeights is absent from the api', async () => {
   jest.useRealTimers();
 });
 
-test('falls through to clone path for dashboard export with a single ag-grid chart', async () => {
+test('captures the dashboard layout with a single ag-grid chart', async () => {
   const dashboard = document.createElement('div');
   dashboard.className = 'dashboard';
 
@@ -564,7 +565,7 @@ test('falls through to clone path for dashboard export with a single ag-grid cha
   await handler({ currentTarget: {} } as any);
 
   expect(mockToJpeg).toHaveBeenCalledWith(
-    expect.any(HTMLElement),
+    dashboard,
     expect.objectContaining({ quality: 0.95 }),
   );
   expect(mockAddWarningToast).not.toHaveBeenCalled();
@@ -572,7 +573,7 @@ test('falls through to clone path for dashboard export with a single ag-grid cha
   document.body.removeChild(dashboard);
 });
 
-test('falls through to clone path for dashboard export with multiple ag-grid charts', async () => {
+test('captures the dashboard layout with multiple ag-grid charts', async () => {
   const dashboard = document.createElement('div');
   dashboard.className = 'dashboard';
 
@@ -591,12 +592,93 @@ test('falls through to clone path for dashboard export with multiple ag-grid cha
   await handler({ currentTarget: {} } as any);
 
   expect(mockToJpeg).toHaveBeenCalledWith(
-    expect.any(HTMLElement),
+    dashboard,
     expect.objectContaining({ quality: 0.95 }),
   );
   expect(mockAddWarningToast).not.toHaveBeenCalled();
 
   document.body.removeChild(dashboard);
+});
+
+test.each([
+  { scrollWidth: 1200, scrollHeight: 1600, width: 1200, height: 1600 },
+  { scrollWidth: 0, scrollHeight: 0, width: 1000, height: 600 },
+])(
+  'preserves dashboard chart layout when exporting at $width x $height',
+  async dimensions => {
+    const dashboard = document.createElement('div');
+    dashboard.className = 'dashboard';
+    dashboard.style.cssText = 'display: flex; height: 600px; width: 1000px;';
+    dashboard.innerHTML = `
+    <div class="chart" style="height: 500px; overflow: hidden; position: relative;">
+      <canvas style="position: absolute; height: 460px;"></canvas>
+    </div>
+    <div class="chart" style="height: 500px; overflow: hidden;">Second chart</div>
+    <div style="display: none;">Inactive tab</div>
+  `;
+    Object.defineProperties(dashboard, {
+      scrollWidth: { value: dimensions.scrollWidth },
+      scrollHeight: { value: dimensions.scrollHeight },
+      offsetWidth: { value: 1000 },
+      offsetHeight: { value: 600 },
+    });
+    document.body.appendChild(dashboard);
+    const originalMarkup = dashboard.outerHTML;
+    const originalChildCount = document.body.childElementCount;
+
+    mockToJpeg.mockImplementation((element: HTMLElement) => {
+      expect(element.outerHTML).toBe(originalMarkup);
+      expect(document.body.childElementCount).toBe(originalChildCount);
+      return Promise.resolve('data:image/jpeg;base64,test');
+    });
+
+    try {
+      await downloadAsImageOptimized(
+        '.dashboard',
+        'My Dashboard',
+        true,
+      )(syntheticEventFor(dashboard));
+
+      expect(mockToJpeg).toHaveBeenCalledWith(
+        dashboard,
+        expect.objectContaining({
+          width: dimensions.width,
+          height: dimensions.height,
+        }),
+      );
+      expect(dashboard.outerHTML).toBe(originalMarkup);
+      expect(mockAddWarningToast).not.toHaveBeenCalled();
+    } finally {
+      dashboard.remove();
+    }
+  },
+);
+
+test('leaves the dashboard intact when image capture fails', async () => {
+  const dashboard = document.createElement('div');
+  dashboard.className = 'dashboard';
+  dashboard.innerHTML =
+    '<div style="height: 500px; overflow: hidden;">Chart</div>';
+  document.body.appendChild(dashboard);
+  const originalMarkup = dashboard.outerHTML;
+  const originalChildCount = document.body.childElementCount;
+  mockToJpeg.mockRejectedValue(new Error('dashboard capture failed'));
+
+  try {
+    await downloadAsImageOptimized(
+      '.dashboard',
+      'My Dashboard',
+      true,
+    )(syntheticEventFor(dashboard));
+
+    expect(dashboard.outerHTML).toBe(originalMarkup);
+    expect(document.body.childElementCount).toBe(originalChildCount);
+    expect(mockAddWarningToast).toHaveBeenCalledWith(
+      'Image download failed, please refresh and try again.',
+    );
+  } finally {
+    dashboard.remove();
+  }
 });
 
 test('captures JPEG for non-ag-grid elements via the clone path', async () => {

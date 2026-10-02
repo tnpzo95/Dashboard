@@ -30,6 +30,13 @@ export const ALLOW_DEPENDENCIES = [
   'filter_time',
 ];
 
+// Calendar pickers can constrain other filters without fetching dependent values.
+export const TEMPORAL_DEPENDENCY_TYPES = [
+  'filter_time',
+  'filter_datetime',
+  'filter_month_range',
+];
+
 interface AvailableFilterOption {
   label: string;
   value: string;
@@ -148,7 +155,8 @@ export function useFilterOperations({
       return (
         component &&
         'filterType' in component &&
-        ALLOW_DEPENDENCIES.includes(component.filterType)
+        (ALLOW_DEPENDENCIES.includes(component.filterType) ||
+          TEMPORAL_DEPENDENCY_TYPES.includes(component.filterType))
       );
     },
     [filterConfigMap, form, filterState.removedItems],
@@ -187,13 +195,26 @@ export function useFilterOperations({
           testMap.set(filterId, testDependencies);
           return !hasCircularDependency(testMap, filterId);
         })
-        .map(id => ({
-          label: getItemTitle(id),
-          value: id,
-          type: filterConfigMap[id]?.filterType,
-        }));
+        .map(id => {
+          const component =
+            form.getFieldValue('filters')?.[id] || filterConfigMap[id];
+          return {
+            label: getItemTitle(id),
+            value: id,
+            type:
+              component && 'filterType' in component
+                ? component.filterType
+                : undefined,
+          };
+        });
     },
-    [buildDependencyMap, canBeUsedAsDependency, filterConfigMap, filterIds],
+    [
+      buildDependencyMap,
+      canBeUsedAsDependency,
+      filterConfigMap,
+      filterIds,
+      form,
+    ],
   );
 
   const validateDependencies = useCallback(() => {

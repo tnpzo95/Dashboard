@@ -49,6 +49,7 @@ import {
   LineAndKPIChartPlugin,
   MergedHeaderTableChartPlugin,
   EchartsPieChartPlugin,
+  StatusDonutChartPlugin,
   EchartsBoxPlotChartPlugin,
   EchartsAreaChartPlugin,
   EchartsTimeseriesChartPlugin,
@@ -103,10 +104,10 @@ export default class MainPreset extends Preset {
       FeatureFlag.ChartPluginsExperimental,
     )
       ? [
-        new BigNumberPeriodOverPeriodChartPlugin().configure({
-          key: VizType.BigNumberPeriodOverPeriod,
-        }),
-      ]
+          new BigNumberPeriodOverPeriodChartPlugin().configure({
+            key: VizType.BigNumberPeriodOverPeriod,
+          }),
+        ]
       : [];
 
     const agGridTablePlugin = isFeatureEnabled(FeatureFlag.AgGridTableEnabled)
@@ -155,6 +156,7 @@ export default class MainPreset extends Preset {
         }),
         new PartitionChartPlugin().configure({ key: VizType.Partition }),
         new EchartsPieChartPlugin().configure({ key: VizType.Pie }),
+        new StatusDonutChartPlugin().configure({ key: VizType.StatusDonut }),
         new PivotTableChartPluginV2().configure({ key: VizType.PivotTable }),
         new RoseChartPlugin().configure({ key: VizType.Rose }),
         new TableChartPlugin().configure({ key: VizType.Table }),
@@ -188,9 +190,15 @@ export default class MainPreset extends Preset {
         }),
         new EchartsHeatmapChartPlugin().configure({ key: VizType.Heatmap }),
         new EchartsHistogramChartPlugin().configure({ key: VizType.Histogram }),
-        new EchartsCycleTimeCapabilityChartPlugin().configure({ key: 'cycle_time_capability' }),
-        new EchartsSPCBoxPlotChartPlugin().configure({ key: VizType.SPCBoxPlot }),
-        new EchartsSummaryStatsChartPlugin().configure({ key: 'summary_stats' }),
+        new EchartsCycleTimeCapabilityChartPlugin().configure({
+          key: 'cycle_time_capability',
+        }),
+        new EchartsSPCBoxPlotChartPlugin().configure({
+          key: VizType.SPCBoxPlot,
+        }),
+        new EchartsSummaryStatsChartPlugin().configure({
+          key: 'summary_stats',
+        }),
         new SelectFilterPlugin().configure({ key: FilterPlugins.Select }),
         new RangeFilterPlugin().configure({ key: FilterPlugins.Range }),
         new TimeFilterPlugin().configure({ key: FilterPlugins.Time }),

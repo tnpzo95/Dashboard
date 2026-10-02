@@ -194,6 +194,7 @@ export type DashboardInfo = {
     timed_refresh_immune_slices?: number[];
     dashboard_chart_visibility?: JsonObject;
     refresh_frequency?: number;
+    user_guide_url?: string | null;
     positions?: JsonObject;
     filter_scopes?: JsonObject;
   };

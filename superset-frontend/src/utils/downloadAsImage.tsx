@@ -457,26 +457,36 @@ export default function downloadAsImageOptimized(
       return;
     }
 
-    // All other chart types: use the clone-based approach
+    // Preserve the dashboard layout. Expanding individual chart contents can
+    // collapse positioned canvases and make adjacent charts overlap.
     let cleanup: (() => void) | null = null;
 
     try {
-      const { clone, cleanup: cleanupFn } = createEnhancedClone(
-        elementToPrint,
-        theme,
-      );
-      cleanup = cleanupFn;
+      let captureElement = elementToPrint as HTMLElement;
+      if (isDashboardCapture) {
+        await document.fonts.ready;
+      } else {
+        const { clone, cleanup: cleanupFn } = createEnhancedClone(
+          elementToPrint,
+          theme,
+        );
+        captureElement = clone;
+        cleanup = cleanupFn;
+      }
 
-      const dataUrl = await domToImage.toJpeg(clone, {
+      const dataUrl = await domToImage.toJpeg(captureElement, {
         bgcolor: theme?.colorBgContainer,
         filter,
         quality: IMAGE_DOWNLOAD_QUALITY,
-        height: clone.scrollHeight,
-        width: clone.scrollWidth,
+        height: Math.max(
+          captureElement.scrollHeight,
+          captureElement.offsetHeight,
+        ),
+        width: Math.max(captureElement.scrollWidth, captureElement.offsetWidth),
         cacheBust: true,
       });
 
-      cleanup();
+      cleanup?.();
       cleanup = null;
 
       const link = document.createElement('a');

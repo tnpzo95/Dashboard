@@ -430,6 +430,7 @@ def _load_due_configs() -> list[dict[str, Any]]:
                    layout_name, last_run_at
             FROM factory_status_task_configs
             WHERE is_active = TRUE
+              AND task_type <> 'node_worker'
             ORDER BY id
             """
         )

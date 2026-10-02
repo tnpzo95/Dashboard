@@ -1777,3 +1777,15 @@ msgstr "Th11"
 msgid "Dec"
 msgstr "Th12"
 
+msgid "User guide"
+msgstr "Hướng dẫn sử dụng"
+
+msgid "User guide URL"
+msgstr "Link hướng dẫn sử dụng"
+
+msgid "Opens the user guide in a new tab. Leave empty to hide the button."
+msgstr "Mở hướng dẫn sử dụng trong tab mới. Để trống để ẩn nút hướng dẫn."
+
+msgid "Enter a valid URL starting with http:// or https://"
+msgstr "Nhập link hợp lệ bắt đầu bằng http:// hoặc https://"
+

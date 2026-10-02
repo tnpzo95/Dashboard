@@ -148,11 +148,15 @@ class DashboardJSONMetadataSchema(Schema):
     chart_customization_config = fields.List(fields.Dict(), allow_none=True)
     dashboard_chart_rotator = fields.Dict(allow_none=True)
     dashboard_hidden_charts = fields.List(fields.Integer(), allow_none=True)
+    dashboard_chart_visibility = fields.Dict(allow_none=True)
     timed_refresh_immune_slices = fields.List(fields.Integer())
     # deprecated wrt dashboard-native filters
     filter_scopes = fields.Dict()
     expanded_slices = fields.Dict()
     refresh_frequency = fields.Integer()
+    user_guide_url = fields.Url(
+        schemes={"http", "https"}, require_tld=False, allow_none=True
+    )
     # deprecated wrt dashboard-native filters
     default_filters = fields.Str()
     stagger_refresh = fields.Boolean()
